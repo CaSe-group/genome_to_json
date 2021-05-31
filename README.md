@@ -1,4 +1,4 @@
-# bacterial_analysis
+# genome_to_json
 CASE-group project to construct a workflow for the simplified analysis of bacterial genomes.
 
 Following tasks needs to be done
