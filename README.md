@@ -1,2 +1,2 @@
 # genome_to_json
-CASE-group project to construct a workflow for the simplified analysis of bacterial genomes.
+CaSe-group project to construct a workflow for the simplified analysis of genomes from fasta-files.
