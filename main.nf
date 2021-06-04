@@ -68,10 +68,14 @@ defaultMSG()
 * MODULES
 **************************/
 
+include { abricate } from './workflows/process/abricate'
+
 
 /************************** 
 * Workflows
 **************************/
+
+abricate(fasta_input_raw_ch)
 
 
 /************************** 
