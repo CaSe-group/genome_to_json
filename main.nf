@@ -73,6 +73,10 @@ defaultMSG()
 * Workflows
 **************************/
 
+if ( params.fasta ) {
+            fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) }
+        }
+
 
 /************************** 
 * MAIN WORKFLOW
