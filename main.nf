@@ -68,6 +68,8 @@ defaultMSG()
 * MODULES
 **************************/
 
+include { split_fasta } from './modules/split_fasta.nf'
+
 
 /************************** 
 * Workflows
