@@ -1,5 +1,5 @@
 process split_fasta {
-  	label 'fastcov'
+	label 'python3'
 	input:
 		path(fasta_input_raw)
 	output:
@@ -7,6 +7,6 @@ process split_fasta {
 	script:
 	"""
 	mkdir -p split_fasta
-    split_fasta.py ${fasta_input_raw}
+	split_fasta.py ${fasta_input_raw}
 	"""
 }

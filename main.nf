@@ -68,22 +68,23 @@ defaultMSG()
 * MODULES
 **************************/
 
-include { split_fasta } from './modules/split_fasta.nf'
+include { split_fasta } from './Modules/split_fasta.nf'
 
 
 /************************** 
 * Workflows
 **************************/
 
-if ( params.fasta ) {
-            fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) }
-        }
+//include { } from './workflows/'
 
 
 /************************** 
 * MAIN WORKFLOW
 **************************/
 
+workflow {
+    if ( params.fasta ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
+}
 
 /*************  
 * --help
@@ -103,6 +104,25 @@ ${c_yellow}Input:${c_reset}
 
     --fasta         direct input of genomes - supports multi-fasta file(s)
     """.stripIndent()
+}
+
+def defaultMSG() {
+    log.info """
+    .
+    \u001B[32mProfile:             $workflow.profile\033[0m
+    \033[2mCurrent User:        $workflow.userName
+    Nextflow-version:    $nextflow.version
+    \u001B[0m
+    Pathing:
+    \033[2mWorkdir location [-work-Dir]:
+        $workflow.workDir
+    Output dir [--output]: 
+        $params.output
+    \u001B[1;30m______________________________________\033[0m
+    Parameters:
+    \u001B[1;30m______________________________________\033[0m
+    """.stripIndent()
+
 }
 
 def header(){
