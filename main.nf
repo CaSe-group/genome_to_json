@@ -68,7 +68,7 @@ defaultMSG()
 * MODULES
 **************************/
 
-include { split_fasta } from './Modules/split_fasta.nf'
+include { split_fasta } from './modules/split_fasta.nf'
 
 
 /************************** 
