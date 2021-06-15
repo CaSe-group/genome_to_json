@@ -75,7 +75,7 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-include { abricate } from './workflows/process/abricate'
+include { abricate_wf } from './workflows/process/abricate'
 
 
 /************************** 
@@ -85,7 +85,7 @@ include { abricate } from './workflows/process/abricate'
 workflow {
     if ( params.fasta ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
 
-    abricate(fasta_input_ch)
+    abricate_wf(fasta_input_ch)
 }
 
 /*************  
