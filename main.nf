@@ -68,20 +68,25 @@ defaultMSG()
 * MODULES
 **************************/
 
-include { abricate } from './workflows/process/abricate'
+include { split_fasta } from './modules/split_fasta.nf'
 
 
 /************************** 
 * Workflows
 **************************/
 
-abricate(fasta_input_raw_ch)
+include { abricate } from './workflows/process/abricate'
 
 
 /************************** 
 * MAIN WORKFLOW
 **************************/
 
+workflow {
+    if ( params.fasta ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
+
+    abricate(fasta_input_ch)
+}
 
 /*************  
 * --help
@@ -101,6 +106,25 @@ ${c_yellow}Input:${c_reset}
 
     --fasta         direct input of genomes - supports multi-fasta file(s)
     """.stripIndent()
+}
+
+def defaultMSG() {
+    log.info """
+    .
+    \u001B[32mProfile:             $workflow.profile\033[0m
+    \033[2mCurrent User:        $workflow.userName
+    Nextflow-version:    $nextflow.version
+    \u001B[0m
+    Pathing:
+    \033[2mWorkdir location [-work-Dir]:
+        $workflow.workDir
+    Output dir [--output]: 
+        $params.output
+    \u001B[1;30m______________________________________\033[0m
+    Parameters:
+    \u001B[1;30m______________________________________\033[0m
+    """.stripIndent()
+
 }
 
 def header(){
