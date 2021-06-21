@@ -80,7 +80,7 @@ def status_parsing(OUTPUT_FILE_NAME):
 	return RESULT_FILE
 
 def res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
-	RES_GENE_LIST = str(DF_ABRICATE['GENE'].values[0]).split(',')
+	RES_GENE_LIST = DF_ABRICATE['GENE'].values
 	if RES_GENE_LIST[0] == 'nan':
 		RES_GENE_LIST[0] = 'no_resistance_genes'
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
