@@ -41,7 +41,7 @@ if (params.profile) { exit 1, "--profile is WRONG use -profile" }
 
 
 // params help
-
+if (!workflow.profile.contains('test_fasta') && !params.fasta) { exit 1, "Input missing, use [--fasta]" }
 
 // check that input params are used as such
 if (params.fasta == true) { exit 5, "Please provide a fasta file via [--fasta]" }
@@ -52,7 +52,7 @@ if (params.fasta == true) { exit 5, "Please provide a fasta file via [--fasta]" 
 **************************/
 
 // fasta input 
-    if ( params.fasta ) { fasta_input_raw_ch = Channel
+    if ( params.fasta && !workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch = Channel
         .fromPath( params.fasta, checkIfExists: true)
     }
 
@@ -68,6 +68,7 @@ defaultMSG()
 * MODULES
 **************************/
 
+include { get_fasta } from './modules/get_fasta_test_data.nf'
 include { split_fasta } from './modules/split_fasta.nf'
 
 
@@ -83,7 +84,10 @@ include { split_fasta } from './modules/split_fasta.nf'
 **************************/
 
 workflow {
-    if ( params.fasta ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
+    if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta() }
+    fasta_input_raw_ch.view()
+    if ( params.fasta || workflow.profile.contains('test_fasta') ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
+    fasta_input_ch.view()
 }
 
 /*************  
