@@ -75,7 +75,7 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-//include { } from './workflows/'
+include { create_json_entries_wf } from './workflows/create_json_entries.nf'
 
 
 /************************** 
@@ -83,7 +83,15 @@ include { split_fasta } from './modules/split_fasta.nf'
 **************************/
 
 workflow {
-    if ( params.fasta ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
+
+    // 1. fasta-input
+        if ( params.fasta ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } 
+    
+    // 2. Genome-analysis (Abricate, Proka, Sourmash)
+
+
+    // 3. json-output
+        create_json_entries_wf(abricate_output_PLACEHOLDER, proka_output_PLACEHOLDER, sourmash_output_PLACEHOLDER)}
 }
 
 /*************  
