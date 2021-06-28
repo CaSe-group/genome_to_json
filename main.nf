@@ -93,7 +93,7 @@ workflow {
 
 
     // 3. json-output
-        create_json_entries_wf(abricate_output_PLACEHOLDER, proka_output_PLACEHOLDER, sourmash_output_PLACEHOLDER)}
+        create_json_entries_wf(abricate_output_PLACEHOLDER, prokka_output_PLACEHOLDER, sourmash_output_PLACEHOLDER)}
 }
 
 /*************  
