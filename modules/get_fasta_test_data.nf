@@ -1,6 +1,5 @@
-
 process get_fasta {
-  	container = 'nanozoo/template:3.8--d089809'
+  	label 'python3'
 	output:
 	path("*.fasta") 
 	script:
