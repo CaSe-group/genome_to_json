@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(description = 'Create json-file for upload to M
 parser.add_argument('-a', '--abricate', help = "Input Abricate-file", required = True)
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
-parser.add_argument('-p', '--proka', help = "Input Proka-file", required = True)
+parser.add_argument('-p', '--prokka', help = "Input Prokka-file", required = True)
 parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", required = True)
 
 #parsing:
@@ -28,7 +28,7 @@ arg = parser.parse_args()
 ABRICATE_INPUT = arg.abricate
 HASHID_INPUT = arg.hashid
 OUTPUT_DIR = arg.output
-PROKA_INPUT = arg.proka
+PROKKA_INPUT = arg.prokka
 SOURMASH_INPUT = arg.sourmash
 
 
@@ -50,7 +50,7 @@ if OUTPUT_PATH != os.getcwd():
 ## Dataframe-creation
 
 DF_ABRICATE = pd.read_csv(ABRICATE_INPUT, sep = '\t')
-DF_PROKA = pd.read_csv(PROKA_INPUT)
+DF_PROKKA = pd.read_csv(PROKKA_INPUT)
 DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
 
 
