@@ -87,14 +87,13 @@ workflow {
     // 1. fasta-input
     if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta() }
 
-    if ( params.splitfasta ) {
+    if ( params.multifasta ) {
         if ( params.fasta || workflow.profile.contains('test_fasta') ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
     }
-    else {
-        fasta_input_ch = fasta_input_raw_ch.flatten().map { it -> tuple(it.simpleName, it) }
-    }
-    // 2. Genome-analysis (Abricate, Proka, Sourmash)
-    fasta_input_ch.view()
+    else { fasta_input_ch = fasta_input_raw_ch.flatten().map { it -> tuple(it.simpleName, it) } }
+
+    // 2. Genome-analysis (Abricate, Prokka, Sourmash)
+
 
     // 3. json-output
        // create_json_entries_wf(abricate_output_PLACEHOLDER, prokka_output_PLACEHOLDER, sourmash_output_PLACEHOLDER)}
