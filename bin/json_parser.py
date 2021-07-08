@@ -15,11 +15,11 @@ import sys
 
 parser = argparse.ArgumentParser(description = 'Create json-file for upload to MongoDB from different result-files.')
 
-parser.add_argument('-a', '--abricate', help = "Input Abricate-file", required = True)
+parser.add_argument('-a', '--abricate', help = "Input Abricate-file", default = 'False')
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
-parser.add_argument('-p', '--prokka', help = "Input Prokka-file", required = True)
-parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", required = True)
+parser.add_argument('-p', '--prokka', help = "Input Prokka-file", default = 'False')
+parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'False')
 
 #parsing:
 arg = parser.parse_args()
@@ -44,14 +44,6 @@ if OUTPUT_PATH != os.getcwd():
         
     #change working directory to the path
     os.chdir(OUTPUT_PATH)
-
-
-################################################################################
-## Dataframe-creation
-
-DF_ABRICATE = pd.read_csv(ABRICATE_INPUT, sep = '\t')
-DF_PROKKA = pd.read_csv(PROKKA_INPUT)
-DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
 
 
 ################################################################################
@@ -111,6 +103,18 @@ def json_file_closing(OUTPUT_FILE_NAME):
 json_file_opening(OUTPUT_FILE_NAME)
 hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
 status_parsing(OUTPUT_FILE_NAME)
-res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
+
+if ABRICATE_INPUT != 'False':
+	DF_ABRICATE = pd.read_csv(ABRICATE_INPUT, sep = '\t')
+	res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
+
+if PROKKA_INPUT != 'False':
+	DF_PROKKA = pd.read_csv(PROKKA_INPUT)
+	#prokka_parsing()
+
+if SOURMASH_INPUT != 'False':
+	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
+	#sourmash_parsing()
+
 analysing_date_parsing(OUTPUT_FILE_NAME)
 json_file_closing(OUTPUT_FILE_NAME)

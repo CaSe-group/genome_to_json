@@ -6,10 +6,19 @@ process json_report {
     output:
 	    tuple val(name), path("*.json")
     script:
+    if ( !params.abricate_off) { abricate_option = "${abricate_result}" }
+    else { abricate_option = 'False' }
+
+    if ( !params.prokka_off) { prokka_option = "${prokka_result}" }
+    else { prokka_option = 'False' }
+
+    if ( !params.sourmash_off) { sourmash_option = "${sourmash_result}" }
+    else { sourmash_option = 'False' }
+
     """
     json_parser.py -i ${name} \
-        -a ${abricate_result} \
-        -p ${prokka_result} \
-        -s ${sourmash_result} \
+        -a ${abricate_option} \
+        -p ${prokka_option} \
+        -s ${sourmash_option}
     """
 }

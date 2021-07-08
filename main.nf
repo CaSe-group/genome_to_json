@@ -76,7 +76,7 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-include { abricate_wf } from './workflows/process/abricate'
+include { abricate_wf } from './workflows/process/abricate_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries.nf'
 
 
@@ -94,11 +94,19 @@ workflow {
     else { fasta_input_ch = fasta_input_raw_ch.flatten().map { it -> tuple(it.simpleName, it) } }
 
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
-    abricate_wf(fasta_input_ch)
+    if ( !params.abricate_off) { abricate_output_ch = abricate_wf(fasta_input_ch) }
+    else { }
+    
+    if ( !params.prokka_off) { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/prokka_placeholder.csv")) }
+    else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/prokka_placeholder.csv")) }
+    
+    if ( !params.sourmash_off) { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/sourmash_placeholder.csv")) }
+    else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/sourmash_placeholder.csv")) }
 
     // 3. json-output
-       // create_json_entries_wf(abricate_output_PLACEHOLDER, prokka_output_PLACEHOLDER, sourmash_output_PLACEHOLDER)}
+    create_json_entries_wf(abricate_output_ch, prokka_output_ch, sourmash_output_ch)
 }
+
 
 /*************  
 * --help

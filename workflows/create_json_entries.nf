@@ -8,6 +8,5 @@ workflow create_json_entries_wf {
     main:
         merged_ch = abricate.join(prokka.map { it -> tuple(it[0], it[1])}.join(sourmash))
 
-        json_report(merged_ch)      
-
+        json_report(merged_ch)
 } 
