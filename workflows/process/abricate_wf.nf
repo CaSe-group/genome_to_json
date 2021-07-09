@@ -7,7 +7,7 @@ process abricate_wf {
     input:
       tuple val(name), path(dir)
     output:
-      tuple val(name), path("*card.tsv"), emit: abricate_output_ch
+      tuple val(name), path("*ncbi.tsv"), emit: abricate_output_ch
     script:
       """
       abricate ${dir} --nopath --quiet --mincov 80 --db ncbi >> "${name}"_abricate_ncbi.tsv
