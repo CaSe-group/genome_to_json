@@ -124,16 +124,21 @@ def helpMSG() {
 ${c_yellow}Input:${c_reset}
 
     --fasta         direct input of genomes - supports multi-fasta file(s)
+    
+${c_yellow}Options:${c_reset}
+
+    --abricate_off  turns off abricate-process
+    --prokka_off    turns off prokka-process
+    --sourmash_off  turns off sourmash-process
     """.stripIndent()
 }
 
 def defaultMSG() {
     log.info """
-    .
     \u001B[32mProfile:             $workflow.profile\033[0m
     \033[2mCurrent User:        $workflow.userName
     Nextflow-version:    $nextflow.version
-    \u001B[0m
+    \u001B[1;30m______________________________________\033[0m
     Pathing:
     \033[2mWorkdir location [-work-Dir]:
         $workflow.workDir
@@ -141,6 +146,9 @@ def defaultMSG() {
         $params.output
     \u001B[1;30m______________________________________\033[0m
     Parameters:
+        \033[2mAbricate switched off:  $params.abricate_off
+        Prokka switched off:    $params.prokka_off
+        Sourmash switched off:  $params.sourmash_off
     \u001B[1;30m______________________________________\033[0m
     """.stripIndent()
 
