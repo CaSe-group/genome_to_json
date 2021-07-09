@@ -94,8 +94,7 @@ workflow {
     else { fasta_input_ch = fasta_input_raw_ch.flatten().map { it -> tuple(it.simpleName, it) } }
 
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
-    if ( !params.abricate_off) { abricate_output_ch = abricate_wf(fasta_input_ch) }
-    else { }
+    abricate_output_ch = abricate_wf(fasta_input_ch)
     
     if ( !params.prokka_off) { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/prokka_placeholder.csv")) }
     else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/prokka_placeholder.csv")) }
