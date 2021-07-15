@@ -76,8 +76,14 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-include { abricate_wf } from './workflows/process/abricate_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries.nf'
+
+
+/************************** 
+* Processes
+**************************/
+
+include { abricate } from './workflows/process/abricate.nf'
 
 
 /************************** 
@@ -94,13 +100,14 @@ workflow {
     else { fasta_input_ch = fasta_input_raw_ch.flatten().map { it -> tuple(it.simpleName, it) } }
 
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
-    abricate_output_ch = abricate_wf(fasta_input_ch)
+    if (!params.abricate_off) { abricate_output_ch = abricate(fasta_input_ch) }
+    else { abricate_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'abricate_dummy.txt', newLine: true)) }
     
-    if ( !params.prokka_off) { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/prokka_placeholder.csv")) }
-    else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/prokka_placeholder.csv")) }
+    if ( !params.prokka_off) { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'prokka_dummy.txt', newLine: true)) }
+    else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'prokka_dummy.txt', newLine: true)) }
     
-    if ( !params.sourmash_off) { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/sourmash_placeholder.csv")) }
-    else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.fromPath(workflow.projectDir + "/data/sourmash_placeholder.csv")) }
+    if ( !params.sourmash_off) { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
+    else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
 
     // 3. json-output
     create_json_entries_wf(abricate_output_ch, prokka_output_ch, sourmash_output_ch)
