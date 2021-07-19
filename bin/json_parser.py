@@ -73,8 +73,8 @@ def status_parsing(OUTPUT_FILE_NAME):
 
 def res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RES_GENE_LIST = DF_ABRICATE['GENE'].values
-	if RES_GENE_LIST[0] == 'nan':
-		RES_GENE_LIST[0] = 'no_resistance_genes'
+	if len(RES_GENE_LIST) == 0:
+		RES_GENE_LIST = ['no_resistance_genes']
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Resistance_Genes\": {\n")
 	[RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\",\n") if RES_GENE != RES_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\"\n") for RES_GENE in RES_GENE_LIST]
@@ -86,7 +86,7 @@ def analysing_date_parsing(OUTPUT_FILE_NAME):
 	DATE = os.popen('date -I | tr -d "-" |tr -d "\n"')
 	ANALYSING_DATE = DATE.read()
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"    \"Analysing_Date\": {ANALYSING_DATE}\n") #no comma after this line, because last line of the file
 	RESULT_FILE.close()
 	return RESULT_FILE
 
