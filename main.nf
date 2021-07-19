@@ -137,6 +137,10 @@ ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
+
+${c_yellow}Test profile:${c_reset}
+    [-profile]-option "test_fasta" runs the test profile using a fasta-file,
+    ignoring regular [--fasta]-input
     """.stripIndent()
 }
 
