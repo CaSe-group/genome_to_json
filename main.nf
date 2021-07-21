@@ -109,6 +109,7 @@ workflow {
     if ( !params.sourmash_off) { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
     else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
 
+    prokka_output_ch = prokka_output_ch[0]
     // 3. json-output
     create_json_entries_wf(abricate_output_ch, prokka_output_ch, sourmash_output_ch)
 }
