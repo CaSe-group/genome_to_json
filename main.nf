@@ -103,13 +103,12 @@ workflow {
     if (!params.abricate_off) { abricate_output_ch = abricate(fasta_input_ch) }
     else { abricate_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'abricate_dummy.txt', newLine: true)) }
     
-    if (!params.prokka_off) { prokka_output_ch = prokka(fasta_input_ch) }
+    if (!params.prokka_off) { prokka(fasta_input_ch) ; prokka_output_ch = prokka.out.prokka_tsv_ch }
     else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'prokka_dummy.txt', newLine: true)) }
     
     if ( !params.sourmash_off) { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
     else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
 
-    prokka_output_ch = prokka_output_ch[0]
     // 3. json-output
     create_json_entries_wf(abricate_output_ch, prokka_output_ch, sourmash_output_ch)
 }
