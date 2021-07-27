@@ -1,0 +1,5 @@
+#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
+GCA_000534275.1.fasta	KI973153.1	2117965	2121117	-	oqxB9	1-3153/3153	===============	0/0	100.00	88.55	ncbi	NG_050458.1	multidrug efflux RND transporter permease subunit OqxB9	PHENICOL;QUINOLONE
+GCA_000534275.1.fasta	KI973153.1	2121142	2122317	-	oqxA10	1-1176/1176	===============	0/0	100.00	85.80	ncbi	NG_050418.1	multidrug efflux RND transporter periplasmic adaptor subunit OqxA10	PHENICOL;QUINOLONE
+GCA_000534275.1.fasta	KI973153.1	3717615	3718040	-	fosA	1-426/426	===============	0/0	100.00	95.07	ncbi	NG_050405.1	fosfomycin resistance glutathione transferase FosA	FOSFOMYCIN
+GCA_000534275.1.fasta	KI973153.1	3890266	3891411	+	blaACT-52	1-1146/1146	===============	0/0	100.00	99.91	ncbi	NG_050715.1	cephalosporin-hydrolyzing class C beta-lactamase ACT-52	CEPHALOSPORIN

@@ -1,0 +1,13 @@
+{
+    "_id": {
+        "$oid": "GCA_000534275"
+    },
+    "Status": "analysed",
+    "Resistance_Genes": {
+        "oqxB9": "true",
+        "oqxA10": "true",
+        "fosA": "true",
+        "blaACT-52": "true"
+    },
+    "Analysing_Date": 20210721
+}
