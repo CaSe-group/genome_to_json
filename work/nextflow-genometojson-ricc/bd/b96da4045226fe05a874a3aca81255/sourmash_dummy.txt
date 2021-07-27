@@ -1,1 +1,0 @@
-/home/ricc/gits/genome_to_json/work/nextflow-genometojson-ricc/tmp/21/011c48fdbb0b968a9d2cdf240855eb/sourmash_dummy.txt

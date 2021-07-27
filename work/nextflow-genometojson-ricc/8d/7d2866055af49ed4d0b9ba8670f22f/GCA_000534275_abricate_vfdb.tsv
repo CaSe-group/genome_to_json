@@ -1,3 +1,0 @@
-#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
-GCA_000534275.1.fasta	KI973153.1	2476215	2477048	+	csgG	1-834/834	===============	0/0	100.00	80.81	vfdb	NP_460110	(csgG) curli production assembly/transport protein CsgG [Agf (VF0103)] [Salmonella enterica subsp. enterica serovar Typhimurium str. LT2]	
-GCA_000534275.1.fasta	KI973153.1	2557223	2558268	+	ompA	1-1031/1041	========/======	4/21	98.75	84.56	vfdb	AAF37887	(ompA) outer membrane protein A [OmpA (VF0236)] [Escherichia coli O18:K1:H7 str. RS218]	

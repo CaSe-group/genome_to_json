@@ -1,1 +1,0 @@
-/home/ricc/gits/genome_to_json/work/nextflow-genometojson-ricc/tmp/bc/59157f33496f680db608d3de365ece/prokka_dummy.txt
