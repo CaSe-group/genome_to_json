@@ -1,6 +1,6 @@
 process abricate {
     label 'abricate'
-    publishDir "${params.output}/2.abricate/${name}/", mode: 'copy', pattern: '*.tsv'
+    publishDir "${params.output}/${name}/2.abricate/", mode: 'copy', pattern: '*.tsv'
     errorStrategy 'retry'
       maxRetries 5
 
