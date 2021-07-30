@@ -85,6 +85,17 @@ def res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 def abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write(f"    \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
+
+def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
+	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
+	if 	len(PROKKA_GENE_LIST) == 0:
+			PROKKA_GENE_LIST = 'no_genes_detected'
+	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)]
+	PROKKA_GENE_LIST = np.unique(PROKKA_GENE_LIST)
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("    \"Genes\": {\n")
+	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != PROKKA_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in PROKKA_GENE_LIST]
+	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
@@ -119,8 +130,8 @@ if ABRICATE_INPUT != 'False':
 	abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION)
 
 if PROKKA_INPUT != 'False':
-	DF_PROKKA = pd.read_csv(PROKKA_INPUT)
-	#prokka_parsing()
+	DF_PROKKA = pd.read_csv(PROKKA_INPUT, sep = '\t')
+	prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
 
 if SOURMASH_INPUT != 'False':
 	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
