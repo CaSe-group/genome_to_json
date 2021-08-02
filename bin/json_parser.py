@@ -82,6 +82,10 @@ def res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
+def abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION):
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write(f"    \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
+
 def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
 	if 	len(PROKKA_GENE_LIST) == 0:
@@ -118,8 +122,12 @@ hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
 status_parsing(OUTPUT_FILE_NAME)
 
 if ABRICATE_INPUT != 'False':
-	DF_ABRICATE = pd.read_csv(ABRICATE_INPUT, sep = '\t')
+	ABRICATE_FILE = arg.abricate.split(',')[0]
+	ABRICATE_DB_VERSION = arg.abricate.split(',')[1]
+	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')
+	
 	res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
+	abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION)
 
 if PROKKA_INPUT != 'False':
 	DF_PROKKA = pd.read_csv(PROKKA_INPUT, sep = '\t')
