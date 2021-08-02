@@ -54,6 +54,8 @@ if (params.fasta == true) { exit 5, "Please provide a fasta file via [--fasta]" 
 // fasta input 
     if ( params.fasta && !workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch = Channel
         .fromPath( params.fasta, checkIfExists: true)
+        .flatten()
+        .map { it -> tuple(it.simpleName, it) }
     }
 
 
@@ -76,15 +78,10 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-include { create_json_entries_wf } from './workflows/create_json_entries.nf'
-
-
-/************************** 
-* Processes
-**************************/
-
-include { abricate } from './workflows/process/abricate.nf'
-include { prokka } from './workflows/process/prokka.nf'
+include { annotation_wf } from './workflows/annotation_wf.nf'
+include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
+include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
+include { taxonomic_determination_wf } from './workflows/taxonomic_determination_wf.nf'
 
 /************************** 
 * MAIN WORKFLOW
@@ -92,25 +89,23 @@ include { prokka } from './workflows/process/prokka.nf'
 
 workflow {
     // 1. fasta-input
-    if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta() }
+    if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta().map { it -> tuple(it.simpleName, it) } }
 
     if ( params.multifasta ) {
-        if ( params.fasta || workflow.profile.contains('test_fasta') ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
+        if ( params.fasta || workflow.profile.contains('test_fasta') ) { fasta_input_ch = split_fasta(fasta_input_raw_ch)
+                                                                                            .flatten()
+                                                                                            .map { it -> tuple(it.simpleName, it) }
+                                                                        }
     }
-    else { fasta_input_ch = fasta_input_raw_ch.flatten().map { it -> tuple(it.simpleName, it) } }
+    else { fasta_input_ch = fasta_input_raw_ch }
 
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
-    if (!params.abricate_off) { abricate_output_ch = abricate(fasta_input_ch) }
-    else { abricate_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'abricate_dummy.txt', newLine: true)) }
-    
-    if (!params.prokka_off) { prokka(fasta_input_ch) ; prokka_output_ch = prokka.out.prokka_tsv_ch }
-    else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'prokka_dummy.txt', newLine: true)) }
-    
-    if ( !params.sourmash_off) { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
-    else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
+    annotation_wf(fasta_input_ch)
+    resistance_determination_wf(fasta_input_ch)
+    taxonomic_determination_wf(fasta_input_ch)
 
     // 3. json-output
-    create_json_entries_wf(abricate_output_ch, prokka_output_ch, sourmash_output_ch)
+    create_json_entries_wf(resistance_determination_wf.out, annotation_wf.out, taxonomic_determination_wf.out)
 }
 
 
