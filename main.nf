@@ -81,7 +81,15 @@ include { split_fasta } from './modules/split_fasta.nf'
 include { annotation_wf } from './workflows/annotation_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
 include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
-include { taxonomic_determination_wf } from './workflows/taxonomic_determination_wf.nf'
+include { taxonomic_classification_wf } from './workflows/taxonomic_classification_wf.nf'
+
+
+/************************** 
+* Processes
+**************************/
+
+include { abricate } from './workflows/process/abricate.nf'
+include { prokka } from './workflows/process/prokka.nf'
 
 /************************** 
 * MAIN WORKFLOW
@@ -102,10 +110,10 @@ workflow {
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
     annotation_wf(fasta_input_ch)
     resistance_determination_wf(fasta_input_ch)
-    taxonomic_determination_wf(fasta_input_ch)
+    taxonomic_classification_wf(fasta_input_ch)
 
     // 3. json-output
-    create_json_entries_wf(resistance_determination_wf.out, annotation_wf.out, taxonomic_determination_wf.out)
+    create_json_entries_wf(resistance_determination_wf.out, annotation_wf.out, taxonomic_classification_wf.out)
 }
 
 

@@ -99,6 +99,40 @@ def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
+def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
+	STATUS = DF_SOURMASH['status'].values[0]
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("    \"Taxonomy\": {\n")
+
+	if STATUS == 'found':
+		TAX_SUPERKINGDOM = DF_SOURMASH['superkingdom'].values[0]
+		TAX_PHYLUM = DF_SOURMASH['phylum'].values[0]
+		TAX_CLASS = DF_SOURMASH['class'].values[0]
+		TAX_ORDER = DF_SOURMASH['order'].values[0]
+		TAX_FAMILY = DF_SOURMASH['family'].values[0]
+		TAX_GENUS = DF_SOURMASH['genus'].values[0]
+		TAX_SPECIES = DF_SOURMASH['species'].values[0]
+		TAX_STRAIN = DF_SOURMASH['strain'].values[0]
+
+		RESULT_FILE.write(f"        \"superkingdom\": \"{TAX_SUPERKINGDOM}\",\n")
+		RESULT_FILE.write(f"        \"phylum\": \"{TAX_PHYLUM}\",\n")
+		RESULT_FILE.write(f"        \"class\": \"{TAX_CLASS}\",\n")
+		RESULT_FILE.write(f"        \"order\": \"{TAX_ORDER}\",\n")
+		RESULT_FILE.write(f"        \"family\": \"{TAX_FAMILY}\",\n")
+		RESULT_FILE.write(f"        \"genus\": \"{TAX_GENUS}\",\n")
+		RESULT_FILE.write(f"        \"species\": \"{TAX_SPECIES}\",\n")
+		RESULT_FILE.write(f"        \"strain\": \"{TAX_STRAIN}\"\n")
+
+	elif STATUS == 'disagree':
+		RESULT_FILE.write(f"        \"contamination\": \"true\"")
+	
+	else:
+		RESULT_FILE.write("			\"classification failed\": \"true\" ")
+	
+	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
 def analysing_date_parsing(OUTPUT_FILE_NAME):
 	DATE = os.popen('date -I | tr -d "-" |tr -d "\n"')					#create bash-output of parsed date
 	ANALYSING_DATE = DATE.read()										#interpret bash-output in python
@@ -135,7 +169,7 @@ if PROKKA_INPUT != 'False':
 
 if SOURMASH_INPUT != 'False':
 	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
-	#sourmash_parsing()
+	sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 
 analysing_date_parsing(OUTPUT_FILE_NAME)
 json_file_closing(OUTPUT_FILE_NAME)

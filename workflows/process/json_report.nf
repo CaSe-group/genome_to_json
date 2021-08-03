@@ -1,5 +1,6 @@
 process json_report {
-        publishDir "${params.output}/${name}/${params.jsondir}/", mode: 'copy'
+        publishDir "${params.output}/${name}/", mode: 'copy'
+        publishDir "${params.output}/${params.jsondir}/", mode: 'copy'
         label 'python3'
     input:
         tuple val(name), path(abricate_result), val(abricate_db_version), path(prokka_result), path(sourmash_result)
