@@ -77,6 +77,7 @@ include { split_fasta } from './modules/split_fasta.nf'
 **************************/
 
 include { create_json_entries_wf } from './workflows/create_json_entries.nf'
+include {taxonomy_classification_wf} from './workflows/taxonomy_classification.nf'
 
 
 /************************** 
@@ -106,7 +107,10 @@ workflow {
     if (!params.prokka_off) { prokka(fasta_input_ch) ; prokka_output_ch = prokka.out.prokka_tsv_ch }
     else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'prokka_dummy.txt', newLine: true)) }
     
-    if ( !params.sourmash_off) { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
+    if ( !params.sourmash_off) { 
+        sourmash_output_ch = taxonomy_classification_wf(fasta_input_ch)
+        }
+    
     else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
 
     // 3. json-output
