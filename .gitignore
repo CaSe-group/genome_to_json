@@ -2,3 +2,4 @@ nextflow/
 .nextflow*
 work/
 results/
+databases/
