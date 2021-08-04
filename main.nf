@@ -54,8 +54,6 @@ if (params.fasta == true) { exit 5, "Please provide a fasta file via [--fasta]" 
 // fasta input 
     if ( params.fasta && !workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch = Channel
         .fromPath( params.fasta, checkIfExists: true)
-        .flatten()
-        .map { it -> tuple(it.simpleName, it) }
     }
 
 
@@ -97,16 +95,13 @@ include { prokka } from './workflows/process/prokka.nf'
 
 workflow {
     // 1. fasta-input
-    if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta().map { it -> tuple(it.simpleName, it) } }
+    if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta() }
 
-    if ( params.multifasta ) {
-        if ( params.fasta || workflow.profile.contains('test_fasta') ) { 
-            fasta_input_ch = split_fasta(fasta_input_raw_ch)
-            .flatten()
-            .map { it -> tuple(it.simpleName, it) }
-        }
+    if ( params.fasta || workflow.profile.contains('test_fasta') ) { 
+        fasta_input_ch = split_fasta(fasta_input_raw_ch)
+        .flatten()
+        .map { it -> tuple(it.simpleName, it) }
     }
-    else { fasta_input_ch = fasta_input_raw_ch }
 
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
     annotation_wf(fasta_input_ch)
