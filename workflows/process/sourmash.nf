@@ -16,13 +16,13 @@ label 'sourmash'
     publishDir "${params.output}/${name}/3.sourmash", mode: 'copy', pattern: "${name}_taxonomy.tsv"
     input:
         tuple val(name), path(signatures)
-        file query
+        path(sourmash_db)
     output: 
         tuple val(name), path("${name}_taxonomy.tsv")
     script:
     """
     sourmash lca classify \
-        --db genbank-k31.lca.json.gz \
+        --db ${sourmash_db} \
         --query ${signatures} \
         > ${name}_taxonomy.tsv
     """  
