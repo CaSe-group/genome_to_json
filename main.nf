@@ -100,10 +100,11 @@ workflow {
     if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta().map { it -> tuple(it.simpleName, it) } }
 
     if ( params.multifasta ) {
-        if ( params.fasta || workflow.profile.contains('test_fasta') ) { fasta_input_ch = split_fasta(fasta_input_raw_ch)
-                                                                                            .flatten()
-                                                                                            .map { it -> tuple(it.simpleName, it) }
-                                                                        }
+        if ( params.fasta || workflow.profile.contains('test_fasta') ) { 
+            fasta_input_ch = split_fasta(fasta_input_raw_ch)
+            .flatten()
+            .map { it -> tuple(it.simpleName, it) }
+        }
     }
     else { fasta_input_ch = fasta_input_raw_ch }
 
