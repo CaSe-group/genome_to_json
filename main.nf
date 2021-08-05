@@ -76,8 +76,10 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-include { create_json_entries_wf } from './workflows/create_json_entries.nf'
-include {taxonomy_classification_wf} from './workflows/taxonomy_classification.nf'
+include { annotation_wf } from './workflows/annotation_wf.nf'
+include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
+include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
+include { taxonomic_classification_wf } from './workflows/taxonomic_classification_wf.nf'
 
 
 /************************** 
@@ -95,26 +97,19 @@ workflow {
     // 1. fasta-input
     if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta() }
 
-    if ( params.multifasta ) {
-        if ( params.fasta || workflow.profile.contains('test_fasta') ) { fasta_input_ch = split_fasta(fasta_input_raw_ch).flatten().map { it -> tuple(it.simpleName, it) } }
+    if ( params.fasta || workflow.profile.contains('test_fasta') ) { 
+        fasta_input_ch = split_fasta(fasta_input_raw_ch)
+        .flatten()
+        .map { it -> tuple(it.simpleName, it) }
     }
-    else { fasta_input_ch = fasta_input_raw_ch.flatten().map { it -> tuple(it.simpleName, it) } }
 
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
-    if (!params.abricate_off) { abricate_output_ch = abricate(fasta_input_ch) }
-    else { abricate_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'abricate_dummy.txt', newLine: true)) }
-    
-    if (!params.prokka_off) { prokka(fasta_input_ch) ; prokka_output_ch = prokka.out.prokka_tsv_ch }
-    else { prokka_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'prokka_dummy.txt', newLine: true)) }
-    
-    if ( !params.sourmash_off) { 
-        sourmash_output_ch = taxonomy_classification_wf(fasta_input_ch)
-        }
-    
-    else { sourmash_output_ch = fasta_input_ch.map{ it -> tuple(it[0]) }.combine(Channel.from('#no_data#').collectFile(name: 'sourmash_dummy.txt', newLine: true)) }
+    annotation_wf(fasta_input_ch)
+    resistance_determination_wf(fasta_input_ch)
+    taxonomic_classification_wf(fasta_input_ch)
 
     // 3. json-output
-    create_json_entries_wf(abricate_output_ch, prokka_output_ch, sourmash_output_ch)
+    create_json_entries_wf(resistance_determination_wf.out, annotation_wf.out, taxonomic_classification_wf.out)
 }
 
 
