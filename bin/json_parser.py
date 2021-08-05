@@ -68,7 +68,7 @@ def hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 
 def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"SampleID\": \"{HASHID_INPUT}\",\n")
+	RESULT_FILE.write(f"    \"Sample_ID\": \"{HASHID_INPUT}\",\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
