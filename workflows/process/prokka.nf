@@ -1,8 +1,9 @@
 process prokka {
     label 'prokka'
-    publishDir "${params.output}/${name}/2.prokka/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.tsv"
-    publishDir "${params.output}/${name}/2.prokka/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.gff"
-    publishDir "${params.output}/${name}/2.prokka/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.txt"
+    publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.tsv"
+    publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.gff"
+    publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.txt"
+	publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.gbk"
     errorStrategy 'retry'
     	maxRetries 5
 

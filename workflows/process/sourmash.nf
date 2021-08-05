@@ -14,7 +14,7 @@ process sourmash_signatures {
 
 process sourmash_classification {
     label 'sourmash'
-    publishDir "${params.output}/${name}/3.sourmash", mode: 'copy', pattern: "${name}_taxonomy.tsv"
+    publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_taxonomy.tsv"
     
     input:
         tuple val(name), path(signatures)
