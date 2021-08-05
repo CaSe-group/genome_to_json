@@ -1,65 +1,76 @@
 #!/usr/bin/env python3
-# SK
+# Original code by Sebastian Krautwurst. Improved by Riccardo Spott.
+
+################################################################################
+## Module-import
 
 import os
 import sys
 import fnmatch
 
-def error(string, error_type=1):
-    sys.stderr.write(f'ERROR: {string}\n')
-    sys.exit(error_type)
 
-def log(string, newline_before=False):
-    if newline_before:
-        sys.stderr.write('\n')
-    sys.stderr.write(f'LOG: {string}\n')
+################################################################################
+## Function-definition
 
-###
+def error(STRING, ERROR_TYPE=1):                                            #define error-code-function taking string and error-type (default = 1)
+    sys.stderr.write(f'ERROR: {STRING}\n')                                  #write string to stderr
+    sys.exit(ERROR_TYPE)                                                    #exit code with error-type
 
-fasta_files = []
-sequence_names = []
-outfh = None
+def log(STRING, NEWLINE_BEFORE=False):                                      #define log-function taking string and newline-before boolean (default = False)
+    if NEWLINE_BEFORE:                                                      #if there is a new line before
+        sys.stderr.write('\n')                                              #write a new line in stderr
+    sys.stderr.write(f'LOG: {STRING}\n')                                    #write string to stderr 
 
-for fasta_file in sys.argv[1:]:
 
-    if not os.path.exists(fasta_file):
-        error(f'Not a file: {fasta_file}')
+################################################################################
+## Script
 
-    log(f'Reading {fasta_file} ...')
-    with open(fasta_file) as infh:
-        for line in infh:
-            if line.startswith('>'):
+SEQUENCE_NAMES = []                                                         #create empty list
+OUTPUT_FILE = None                                                          #set variable
+
+for FASTA_FILE in sys.argv[1:]:                                             #for-loop over all fasta-files given in the command-line after the program-call
+
+    if not os.path.exists(FASTA_FILE):                                      #check if fasta-file exists
+        error(f'Not a file: {FASTA_FILE}')                                  #if False trigger error-function
+
+    log(f'Reading {FASTA_FILE} ...')                                        #trigger log-function
+    with open(FASTA_FILE) as IN_FILE:                                       #open fasta-file under variable IN_FILE
+        for LINE in IN_FILE:                                                #for-loop over all lines of IN_FILE
+            if LINE.startswith('>'):
 
                 # new sequence
-                seq_name = line.strip().split()[0][1:]
-                assert seq_name != '', f'Empty header in file: {fasta_file}'
+                SEQ_NAME = LINE.strip().split()[0][1:]                      #remove leading/tailing whitespaces from LINE, split it by each whitespace
+                                                                            #and take only the first element beginning from the second character
+                assert SEQ_NAME != '', f'Empty header in file: {FASTA_FILE}'#check if SEQ_NAME and therefore the strip-splitted-fasta header is empty
                 
                 # sanitize
-                seq_name = seq_name.replace('/', '_').replace(':', '_').replace('|','_')
+                SEQ_NAME = SEQ_NAME.replace('/', '_').replace(':', '_').replace('|','_')    #replace all '/',':' & '|' with '_' in SEQ_NAME
 
                 # handle duplicates
-                if seq_name in sequence_names:
-                    log(f'WARNING: Duplicate sequence name: {seq_name}')
-                    # add number to seq_name, according to how often seq_name alrready appeared
-                    duplicate_seq_name_pattern = f'{seq_name}_duplicate*'
-                    seq_name += f'_duplicate{int(len([item for item in sequence_names if item == seq_name or fnmatch.fnmatch(item ,duplicate_seq_name_pattern)])):02d}'
-                
+                if SEQ_NAME in SEQUENCE_NAMES:                              #check if SEQ_NAME is in list SEQUENCE_NAMES
+                    log(f'WARNING: Duplicate sequence name: {SEQ_NAME}')    #trigger log-function
+                    # add number to SEQ_NAME, according to how often SEQ_NAME already appeared
+                    DUPLICATE_SEQ_NAME_PATTERN = f'{SEQ_NAME}_duplicate*'   #create search-pattern from SEQ_NAME utilizing bash-wildstar
+                    SEQ_NAME += f'_duplicate{int(len([ITEM for ITEM in SEQUENCE_NAMES if ITEM == SEQ_NAME or fnmatch.fnmatch(ITEM ,DUPLICATE_SEQ_NAME_PATTERN)])):02d}'
+                                                                            #list-comprehension over all items in list SEQUENCE_NAMES checking if item equals SEQ_NAME or matches the search-pattern /
+                                                                            #-> if True takes length of resulting list as integer with 2 characters and attaches it as '_duplicate??' to SEQ_NAME/
+                                                                            #-> e.g., 3 times SEQ_NAME(_duplicate??) in list SEQUENCE_NAMES -> list of 3 items-> len = 3 -> int(3):02d = 03 -> SEQ_NAME_duplicate03
                 # save
-                sequence_names.append(seq_name)
+                SEQUENCE_NAMES.append(SEQ_NAME)                             #add SEQ_NAME to end of list SEQUENCES_NAMES
 
                 # write to separate file
-                if outfh is not None:
-                    outfh.close()
-                outfile = 'split_fasta/' + seq_name + '.fasta'
-                log(f'Writing {outfile}')
-                outfh = open(outfile, 'w')
-                outfh.write(f'>{seq_name}\n')
+                if OUTPUT_FILE is not None:
+                    OUTPUT_FILE.close()                                     #if True close OUTPUT_FILE
+                OUTPUT_FILE_NAME = 'split_fasta/' + SEQ_NAME + '.fasta'     #create OUTPUT_FILE_NAME from SEQ_NAME & strings
+                log(f'Writing {OUTPUT_FILE_NAME}')                          #trigger log-function
+                OUTPUT_FILE = open(OUTPUT_FILE_NAME, 'w')                   #open a file named OUTPUT_FILE_NAME with write-access under variable OUTPUT_FILE
+                OUTPUT_FILE.write(f'>{SEQ_NAME}\n')                         #write SEQ_NAME as part of a string into OUTPUT_FILE
                 
             else:
                 # write rest of lines (and fix windows line endings)
-                outfh.write(line.replace('\r',''))
+                OUTPUT_FILE.write(LINE.replace('\r',''))                    #write each LINE not starting with '>' into OUTPUT_FILE after replacing Windows line-endings
 
         # done for this file
-        outfh.close()
+        OUTPUT_FILE.close()                                                 #close OUTPUT_FILE
 
-log('Done.')
+log('Done.')                                                                #trigger log-function
