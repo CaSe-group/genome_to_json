@@ -85,6 +85,8 @@ def res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 def abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write(f"    \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
 
 def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
@@ -96,6 +98,12 @@ def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	RESULT_FILE.write("    \"Genes\": {\n")
 	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != PROKKA_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in PROKKA_GENE_LIST]
 	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+def prokka_version_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION):
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write(f"    \"Prokka_Version\": \"{PROKKA_VERSION}\",\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
@@ -156,16 +164,20 @@ hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
 status_parsing(OUTPUT_FILE_NAME)
 
 if ABRICATE_INPUT != 'False':
-	ABRICATE_FILE = arg.abricate.split(',')[0]							#split abricate-input by ',' taking the first resulting element
-	ABRICATE_DB_VERSION = arg.abricate.split(',')[1]					#split abricate-input by ',' taking the second resulting element
+	ABRICATE_FILE = ABRICATE_INPUT.split(',')[0]							#split abricate-input by ',' taking the first resulting element
+	ABRICATE_DB_VERSION = ABRICATE_INPUT.split(',')[1]					#split abricate-input by ',' taking the second resulting element
 	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 	
 	res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
 	abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION)
 
 if PROKKA_INPUT != 'False':
-	DF_PROKKA = pd.read_csv(PROKKA_INPUT, sep = '\t')
+	PROKKA_FILE = PROKKA_INPUT.split(',')[0]
+	PROKKA_VERSION = PROKKA_INPUT.split(',')[1]
+	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
+	
 	prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
+	prokka_version_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION)
 
 if SOURMASH_INPUT != 'False':
 	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)

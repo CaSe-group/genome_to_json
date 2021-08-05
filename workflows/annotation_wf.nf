@@ -9,7 +9,8 @@ workflow annotation_wf {
                                     .map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
                                     .combine(Channel.from('#no_data#')
                                     .collectFile(name: 'prokka_dummy.txt', newLine: true)) //create & add dummy-file to the tuple
+                                    .combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
         }
     emit:
-        prokka_output_ch //tuple val(fasta_basename) path(prokka_file)
+        prokka_output_ch //tuple val(fasta_basename) path(prokka_file) val(prokka_version)
 }
