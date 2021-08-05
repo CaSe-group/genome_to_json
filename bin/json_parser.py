@@ -15,11 +15,12 @@ import sys
 
 parser = argparse.ArgumentParser(description = 'Create json-file for upload to MongoDB from different result-files.')
 
-parser.add_argument('-a', '--abricate', help = "Input Abricate-file", default = 'False')
+parser.add_argument('-a', '--abricate', help = "Input Abricate-file", default = 'false')
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
+parser.add_argument('-n', '--new_entry', help = "Activate to generate new entry-json for the db", default = 'false' )
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
-parser.add_argument('-p', '--prokka', help = "Input Prokka-file", default = 'False')
-parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'False')
+parser.add_argument('-p', '--prokka', help = "Input Prokka-file", default = 'false')
+parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'false')
 
 #parsing:
 arg = parser.parse_args()
@@ -27,6 +28,7 @@ arg = parser.parse_args()
 #define arguments as variables:
 ABRICATE_INPUT = arg.abricate
 HASHID_INPUT = arg.hashid
+NEW_ENTRY = arg.new_entry
 OUTPUT_DIR = arg.output
 PROKKA_INPUT = arg.prokka
 SOURMASH_INPUT = arg.sourmash
@@ -62,6 +64,12 @@ def hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.write("    \"_id\": {\n")
 	RESULT_FILE.write(f"        \"$oid\": \"{HASHID_INPUT}\"\n")
 	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write(f"    \"SampleID\": \"{HASHID_INPUT}\",\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
@@ -151,10 +159,15 @@ def json_file_closing(OUTPUT_FILE_NAME):
 ## Function calls
 
 json_file_opening(OUTPUT_FILE_NAME)
-hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+
+if NEW_ENTRY != 'false':
+	sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+else:
+	hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+
 status_parsing(OUTPUT_FILE_NAME)
 
-if ABRICATE_INPUT != 'False':
+if ABRICATE_INPUT != 'false':
 	ABRICATE_FILE = arg.abricate.split(',')[0]
 	ABRICATE_DB_VERSION = arg.abricate.split(',')[1]
 	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')
@@ -162,11 +175,11 @@ if ABRICATE_INPUT != 'False':
 	res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
 	abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION)
 
-if PROKKA_INPUT != 'False':
+if PROKKA_INPUT != 'false':
 	DF_PROKKA = pd.read_csv(PROKKA_INPUT, sep = '\t')
 	prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
 
-if SOURMASH_INPUT != 'False':
+if SOURMASH_INPUT != 'false':
 	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
 	sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 

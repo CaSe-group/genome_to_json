@@ -164,6 +164,8 @@ def defaultMSG() {
         \033[2mAbricate switched off:  $params.abricate_off
         Prokka switched off:    $params.prokka_off
         Sourmash switched off:  $params.sourmash_off
+
+        New entry:              $params.new_entry
     \u001B[1;30m______________________________________\033[0m
     """.stripIndent()
 
