@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(description = 'Create json-file for upload to M
 #define arguments
 parser.add_argument('-a', '--abricate', help = "Input Abricate-file", default = 'False')
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
-parser.add_argument('-n', '--new_entry', help = "Activate to generate new entry-json for the db", default = 'false' )
+parser.add_argument('-n', '--new_entry', help = "Activates parsing of hash-ID as sample-ID", default = 'false' )
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
 parser.add_argument('-p', '--prokka', help = "Input Prokka-file", default = 'false')
 parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'false')
