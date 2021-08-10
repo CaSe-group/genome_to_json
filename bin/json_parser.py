@@ -18,9 +18,10 @@ parser = argparse.ArgumentParser(description = 'Create json-file for upload to M
 #define arguments
 parser.add_argument('-a', '--abricate', help = "Input Abricate-file", default = 'False')
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
+parser.add_argument('-n', '--new_entry', help = "Activates parsing of hash-ID as sample-ID", default = 'false' )
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
-parser.add_argument('-p', '--prokka', help = "Input Prokka-file", default = 'False')
-parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'False')
+parser.add_argument('-p', '--prokka', help = "Input Prokka-file", default = 'false')
+parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'false')
 
 #parsing:
 arg = parser.parse_args()
@@ -28,6 +29,7 @@ arg = parser.parse_args()
 #set arguments as variables:
 ABRICATE_INPUT = arg.abricate
 HASHID_INPUT = arg.hashid
+NEW_ENTRY = arg.new_entry
 OUTPUT_DIR = arg.output
 PROKKA_INPUT = arg.prokka
 SOURMASH_INPUT = arg.sourmash
@@ -61,6 +63,12 @@ def hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.write("    \"_id\": {\n")
 	RESULT_FILE.write(f"        \"$oid\": \"{HASHID_INPUT}\"\n")
 	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write(f"    \"Sample_ID\": \"{HASHID_INPUT}\",\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
@@ -160,18 +168,23 @@ def json_file_closing(OUTPUT_FILE_NAME):
 ## Function calls
 
 json_file_opening(OUTPUT_FILE_NAME)										#trigger function 'json_file_opening' with according input
-hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+
+if NEW_ENTRY != 'false':
+	sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+else:
+	hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+
 status_parsing(OUTPUT_FILE_NAME)
 
-if ABRICATE_INPUT != 'False':
-	ABRICATE_FILE = ABRICATE_INPUT.split(',')[0]							#split abricate-input by ',' taking the first resulting element
+if ABRICATE_INPUT != 'false':
+	ABRICATE_FILE = ABRICATE_INPUT.split(',')[0]						#split abricate-input by ',' taking the first resulting element
 	ABRICATE_DB_VERSION = ABRICATE_INPUT.split(',')[1]					#split abricate-input by ',' taking the second resulting element
 	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 	
 	res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
 	abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION)
 
-if PROKKA_INPUT != 'False':
+if PROKKA_INPUT != 'false':
 	PROKKA_FILE = PROKKA_INPUT.split(',')[0]
 	PROKKA_VERSION = PROKKA_INPUT.split(',')[1]
 	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
@@ -179,7 +192,7 @@ if PROKKA_INPUT != 'False':
 	prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
 	prokka_version_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION)
 
-if SOURMASH_INPUT != 'False':
+if SOURMASH_INPUT != 'false':
 	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
 	sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 

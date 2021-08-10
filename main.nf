@@ -136,7 +136,8 @@ ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
-
+    
+    --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therfore json can be uploaded as new entry)
 ${c_yellow}Test profile:${c_reset}
     [-profile]-option "test_fasta" runs the test profile using a fasta-file,
     ignoring regular [--fasta]-input
@@ -159,6 +160,8 @@ def defaultMSG() {
         \033[2mAbricate switched off:  $params.abricate_off
         Prokka switched off:    $params.prokka_off
         Sourmash switched off:  $params.sourmash_off
+
+        New entry:              $params.new_entry
     \u001B[1;30m______________________________________\033[0m
     """.stripIndent()
 
