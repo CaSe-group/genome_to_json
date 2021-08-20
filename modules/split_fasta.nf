@@ -11,7 +11,7 @@ process split_fasta {
 	"""
 	stub:
 	"""
-	echo ">A\nATGCC" > A.fasta
-	echo ">B\nTTGGC" > B.fasta
+	echo ">A\\nATGCC" > A.fasta
+	echo ">B\\nTTGGC" > B.fasta
 	"""
 }
