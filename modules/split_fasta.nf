@@ -11,7 +11,8 @@ process split_fasta {
 	"""
 	stub:
 	"""
-	echo ">A\\nATGCC" > A.fasta
-	echo ">B\\nTTGGC" > B.fasta
+	mkdir -p split_fasta
+	echo ">A\\nATGCC" > split_fasta/A.fasta
+	echo ">B\\nTTGGC" > split_fasta/B.fasta
 	"""
 }
