@@ -17,4 +17,9 @@ process abricate {
         
         ABRICATE_DB_VERSION=\$(abricate --list | grep "ncbi" | cut -f 1,4 | tr "\t" "_")
         """
+    stub:
+        """
+        touch "${name}"_abricate_ncbi.tsv "${name}"_abricate_card.tsv
+        ABRICATE_DB_VERSION=stub
+        """
 }

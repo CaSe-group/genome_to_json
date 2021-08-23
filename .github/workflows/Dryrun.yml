@@ -1,0 +1,23 @@
+name: DryRun
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Help_test
+      run: curl -s https://get.nextflow.io | bash && ./nextflow run main.nf --help
+    - name: fasta dry run
+      run: |
+          touch genome.fasta 
+          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub
+    - name: fasta dry run - tool deactivation 1
+      run: |
+          touch genome.fasta 
+          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --new_entry --sourmash_off
+    - name: fasta dry run - tool deactivation 2
+      run: |
+          touch genome.fasta 
+          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --output new_result_dir --prokka_off

@@ -21,4 +21,12 @@ process prokka {
     	
         PROKKA_VERSION=\$(cat /opt/conda/pkgs/prokka*/bin/prokka | grep 'my \$VERSION =' | cut -f4 -d ' ' | tr -d '"' | tr -d ';')
         """
+    stub:
+        """
+        mkdir -p ${name}_prokka
+        touch ${name}_prokka/${name}_prokka.tsv \
+            ${name}_prokka/${name}_prokka.gbk
+        
+        PROKKA_VERSION=stub
+        """
 }

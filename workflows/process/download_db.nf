@@ -8,4 +8,8 @@ process download_db {
         """
         wget -O genbank-k31.lca.json.gz https://osf.io/4f8n3/download
         """
+    stub:
+        """
+        touch genbank-k31.lca.json.gz
+        """
 }
