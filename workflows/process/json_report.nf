@@ -24,4 +24,8 @@ process json_report {
         -p ${prokka_input} \
         -s ${sourmash_input}
     """
+    stub:
+        """
+        touch results.json
+        """
 }

@@ -9,4 +9,10 @@ process split_fasta {
 	mkdir -p split_fasta
 	split_fasta.py ${fasta_input_raw}
 	"""
+	stub:
+	"""
+	mkdir -p split_fasta
+	echo ">A\\nATGCC" > split_fasta/A.fasta
+	echo ">B\\nTTGGC" > split_fasta/B.fasta
+	"""
 }

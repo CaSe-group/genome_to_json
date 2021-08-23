@@ -10,6 +10,10 @@ process sourmash_signatures {
         """
         sourmash sketch dna -p scaled=1000,k=31 --name-from-first ${reads}
         """
+    stub:
+        """
+        touch signature.sig
+        """
 }
 
 process sourmash_classification {
@@ -28,5 +32,9 @@ process sourmash_classification {
             --query ${signatures} \
             > ${name}_taxonomy.tsv
         """  
+    stub:
+        """
+        touch ${name}_taxonomy.tsv
+        """
 }
 
