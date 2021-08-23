@@ -108,7 +108,7 @@ workflow {
             .map { it -> tuple(it.baseName, it) }
         }
     }
-    fasta_input_ch.view()
+
     // 2. Genome-analysis (Abricate, Prokka, Sourmash)
     annotation_wf(fasta_input_ch)
     resistance_determination_wf(fasta_input_ch)
