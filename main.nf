@@ -134,17 +134,16 @@ def helpMSG() {
     nextflow run CaSe-group/genome_to_json --fasta '/path/to/fasta'
 
 ${c_yellow}Input:${c_reset}
-
     --fasta         direct input of genomes - supports multi-fasta file(s)
     
 ${c_yellow}Options:${c_reset}
-
     --abricate_off  turns off abricate-process
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
     
     --split_fasta   splits multi-line fastas into single fasta-files
     --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therefore json can be uploaded as new entry)
+
 ${c_yellow}Test profile:${c_reset}
     [-profile]-option "test_fasta" runs the test profile using a fasta-file,
     ignoring regular [--fasta]-input
