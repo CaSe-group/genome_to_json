@@ -18,7 +18,7 @@ process abricate {
         """
     stub:
         """
-        touch "${name}"_abricate_ncbi.tsv "${name}"_abricate_card.tsv
+        touch "${name}"_abricate_ncbi.tsv
         ABRICATE_DB_VERSION=stub
         """
 }
