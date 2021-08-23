@@ -4,7 +4,11 @@ workflow resistance_determination_wf {
     take: 
         fasta_input //tuple val(fasta_basename) path(fasta_file)
     main:
-        if (!params.abricate_off) { abricate_output_ch = abricate(fasta_input) }
+        if (!params.abricate_off) {
+            abricate_db = ['ncbi', 'card', 'vfdb', 'ecoh', 'argannot', 'plasmidfinder', 'resfinder']
+            abricate(fasta_input, abricate_db)  //start process abricate with according variables
+            abricate_output_ch = abricate.out.abricate_output_ch    //assign main-output of abricate-process to channel
+        }
         else { abricate_output_ch = fasta_input
                                     .map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
                                     .combine(Channel.from('#no_data#')
