@@ -22,4 +22,8 @@ process abricate_plot {
 		facet_wrap(~ group, scales = "free_y") + coord_flip()
 		dev.off()
 		"""
+	stub:
+		"""
+		touch "${name}"_"${abricate_db}".pdf
+		"""
 }
