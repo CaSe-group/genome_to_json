@@ -6,10 +6,10 @@ process download_db {
         path("*.json.gz")
     script:
         """
-        wget -O genbank-k31.lca.json.gz https://osf.io/4f8n3/download
+        wget -O gtdb-rs202.genomic.k31.lca.json.gz https://osf.io/9xdg2/download 
         """
     stub:
         """
-        touch genbank-k31.lca.json.gz
+        touch gtdb-rs202.genomic.k31.lca.json.gz
         """
 }
