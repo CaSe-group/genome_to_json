@@ -1,4 +1,6 @@
-include { abricate } from './process/abricate.nf' 
+include { abricate } from './process/abricate.nf'
+include { abricate_plot } from './process/abricate_plot.nf'
+include { abricate_res_parser } from './process/abricate_res_parser.nf'
 
 workflow resistance_determination_wf {
     take: 
@@ -8,6 +10,8 @@ workflow resistance_determination_wf {
             abricate_db = ['ncbi', 'card', 'vfdb', 'ecoh', 'argannot', 'plasmidfinder', 'resfinder']
             abricate(fasta_input, abricate_db)  //start process abricate with according variables
             abricate_output_ch = abricate.out.abricate_output_ch    //assign main-output of abricate-process to channel
+            
+            abricate_plot(abricate_res_parser(abricate.out.abricate_files_ch))
         }
         else { abricate_output_ch = fasta_input
                                     .map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
