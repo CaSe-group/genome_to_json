@@ -26,6 +26,6 @@ process json_report {
     """
     stub:
         """
-        touch results.json
+        touch "${name}"_report.json
         """
 }
