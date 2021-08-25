@@ -43,8 +43,4 @@ process abricate_res_parser {
 			uniq -c | sed -e 's/^[ \\t]*//'| tr -d "'" | tr " " ";" | sed -e 's/\$/;other-resistance-genes/') 
 		printf "\${otherData}\\n" >> "${name}"_"${abricate_db}".csv
 		"""
-	stub:
-        """
-        touch "${name}"_"${abricate_db}".csv
-        """
 }
