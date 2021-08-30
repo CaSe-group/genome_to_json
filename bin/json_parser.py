@@ -66,59 +66,46 @@ def hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
-	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Sample_ID\": \"{HASHID_INPUT}\",\n")
-	RESULT_FILE.close()
-	return RESULT_FILE
-
 def status_parsing(OUTPUT_FILE_NAME):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Status\": \"analysed\",\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
+def abricate_parsing(OUTPUT_FILE_NAME, DF_ABRICATE, ABRICATE_DB_VERSION, ANALYZING_DATE):
 	RES_GENE_LIST = DF_ABRICATE['GENE'].values							#get list of all entries of 'GENE'-column in abricate-dataframe
 	if len(RES_GENE_LIST) == 0:											#check if length of the list = 0
 		RES_GENE_LIST = ['no_resistance_genes']							#if true set variable to single element list
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Resistance_Genes\": {\n")
+	RESULT_FILE.write("    \"Abricate\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"        \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
 	[RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\",\n") if RES_GENE != RES_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\"\n") for RES_GENE in RES_GENE_LIST]
 	#list comprehension over all RES_GENE´s in RES_GENE_LIST -> writes '"RES_GENE": "true",' to RESULT_FILE if not last list-element; else writes '"RES_GENE": "true"' (without comma)
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION):
-	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
-	RESULT_FILE.close()
-	return RESULT_FILE
-
-def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
+def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA, PROKKA_VERSION, ANALYSING_DATE):
 	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
 	if len(PROKKA_GENE_LIST) == 0:
 			PROKKA_GENE_LIST = ['no_genes_detected']
 	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)]	#select all elements from PROKKA_GENE_LIST that are not null
 	PROKKA_GENE_LIST = np.unique(PROKKA_GENE_LIST)						#remove duplicates from PROKKA_GENE_LIST
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Genes\": {\n")
+	RESULT_FILE.write("    \"Prokka\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"        \"Prokka_Version\": \"{PROKKA_VERSION}\",\n")	
 	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != PROKKA_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in PROKKA_GENE_LIST]
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def prokka_version_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION):
-	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Prokka_Version\": \"{PROKKA_VERSION}\",\n")
-	RESULT_FILE.close()
-	return RESULT_FILE
-
-def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
+def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH, ANALYSING_DATE):
 	STATUS = DF_SOURMASH['status'].values[0]
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Taxonomy\": {\n")
+	RESULT_FILE.write("    \"Sourmash\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
 
 	if STATUS == 'found':
 		TAX_SUPERKINGDOM = DF_SOURMASH['superkingdom'].values[0]
@@ -149,11 +136,9 @@ def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def analysing_date_parsing(OUTPUT_FILE_NAME):
-	DATE = os.popen('date -I | tr -d "-" |tr -d "\n"')					#create bash-output of parsed date
-	ANALYSING_DATE = DATE.read()										#interpret bash-output in python
+def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Analysing_Date\": {ANALYSING_DATE}\n") 	#no comma after this line, because last line of the file
+	RESULT_FILE.write(f"    \"Sample_ID\": \"{HASHID_INPUT}\"\n")	#no comma after this line, because last line of the file
 	RESULT_FILE.close()
 	return RESULT_FILE
 
@@ -167,6 +152,9 @@ def json_file_closing(OUTPUT_FILE_NAME):
 ################################################################################
 ## Function calls
 
+DATE = os.popen('date -I | tr -d "-" |tr -d "\n"')					#create bash-output of parsed date
+ANALYSING_DATE = DATE.read()										#interpret bash-output in python
+
 json_file_opening(OUTPUT_FILE_NAME)										#trigger function 'json_file_opening' with according input
 
 if NEW_ENTRY != 'false':
@@ -174,27 +162,23 @@ if NEW_ENTRY != 'false':
 else:
 	hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
 
-status_parsing(OUTPUT_FILE_NAME)
-
 if ABRICATE_INPUT != 'false':
 	ABRICATE_FILE = ABRICATE_INPUT.split(',')[0]						#split abricate-input by ',' taking the first resulting element
 	ABRICATE_DB_VERSION = ABRICATE_INPUT.split(',')[1]					#split abricate-input by ',' taking the second resulting element
 	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 	
-	res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
-	abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION)
+	abricate_parsing(OUTPUT_FILE_NAME, DF_ABRICATE, ABRICATE_DB_VERSION, ANALYSING_DATE)
 
 if PROKKA_INPUT != 'false':
 	PROKKA_FILE = PROKKA_INPUT.split(',')[0]
 	PROKKA_VERSION = PROKKA_INPUT.split(',')[1]
 	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
 	
-	prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
-	prokka_version_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION)
+	prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA, PROKKA_VERSION, ANALYSING_DATE)
 
 if SOURMASH_INPUT != 'false':
 	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
-	sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
+	sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH, ANALYSING_DATE)
 
-analysing_date_parsing(OUTPUT_FILE_NAME)
+status_parsing(OUTPUT_FILE_NAME)
 json_file_closing(OUTPUT_FILE_NAME)
