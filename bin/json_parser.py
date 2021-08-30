@@ -66,9 +66,9 @@ def hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def status_parsing(OUTPUT_FILE_NAME):
+def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Status\": \"analysed\",\n")
+	RESULT_FILE.write(f"    \"Sample_ID\": \"{HASHID_INPUT}\",\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
@@ -136,9 +136,9 @@ def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH, ANALYSING_DATE):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
+def status_parsing(OUTPUT_FILE_NAME):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Sample_ID\": \"{HASHID_INPUT}\"\n")	#no comma after this line, because last line of the file
+	RESULT_FILE.write("    \"Status\": \"analysed\"\n")	#no comma after this line, because last line of the file
 	RESULT_FILE.close()
 	return RESULT_FILE
 
