@@ -115,11 +115,20 @@ def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH, ANALYSING_DATE):
+def sourmash_info_parsing(OUTPUT_FILE_NAME, ANALYSING_DATE):
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("    \"Sourmash_Info\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+
+def sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
 	STATUS = DF_SOURMASH['status'].values[0]
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Sourmash\": {\n")
-	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write("    \"Sourmash_Result\": {\n")
+	RESULT_FILE.write(f"        \"Status\": {STATUS},\n")
 
 	if STATUS == 'found':
 		TAX_SUPERKINGDOM = str(DF_SOURMASH['superkingdom'].values[0])[3:] if str(DF_SOURMASH['superkingdom'].values[0]) != "nan" else str(DF_SOURMASH['superkingdom'].values[0])
