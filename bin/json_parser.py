@@ -106,11 +106,14 @@ def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
 	if len(PROKKA_GENE_LIST) == 0:
 			PROKKA_GENE_LIST = ['no_genes_detected']
-	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)]	#select all elements from PROKKA_GENE_LIST that are not null
-	PROKKA_GENE_LIST = np.unique(PROKKA_GENE_LIST)						#remove duplicates from PROKKA_GENE_LIST
+	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)].tolist()
+	
+	STRIPPED_GENE_LIST = [GENE.split('_',1)[0] for GENE in PROKKA_GENE_LIST]
+	STRIPPED_GENE_LIST = (list(dict.fromkeys(STRIPPED_GENE_LIST)))	#remove duplicates by converting list to a dict using the elements as keys (each key can only exist once) & back to list
+
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Prokka_Result\": {\n")
-	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != PROKKA_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in PROKKA_GENE_LIST]
+	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != STRIPPED_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in STRIPPED_GENE_LIST]
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
