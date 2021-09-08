@@ -72,7 +72,7 @@ def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION, ANALYZING_DATE):
+def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION, ANALYSING_DATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Abricate_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -118,10 +118,11 @@ def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def sourmash_info_parsing(OUTPUT_FILE_NAME, ANALYSING_DATE):
+def sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION, ANALYSING_DATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Sourmash_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"        \"Sourmash_Version\": \"{SOURMASH_VERSION}\"\n")
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
@@ -131,7 +132,7 @@ def sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
 	STATUS = DF_SOURMASH['status'].values[0]
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Sourmash_Result\": {\n")
-	RESULT_FILE.write(f"        \"Status\": {STATUS},\n")
+	RESULT_FILE.write(f"        \"Status\": \"{STATUS}\",\n")
 
 	if STATUS == 'found':
 		TAX_SUPERKINGDOM = str(DF_SOURMASH['superkingdom'].values[0])[3:] if str(DF_SOURMASH['superkingdom'].values[0]) != "nan" else str(DF_SOURMASH['superkingdom'].values[0])
@@ -205,8 +206,12 @@ if PROKKA_INPUT != 'false':
 	prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
 
 if SOURMASH_INPUT != 'false':
-	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
-	sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH, ANALYSING_DATE)
+	SOURMASH_FILE = SOURMASH_INPUT.split(',')[0]
+	SOURMASH_VERSION = SOURMASH_INPUT.split(',')[1]
+	DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
+
+	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION, ANALYSING_DATE)
+	sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 
 status_parsing(OUTPUT_FILE_NAME)
 json_file_closing(OUTPUT_FILE_NAME)

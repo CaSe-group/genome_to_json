@@ -7,7 +7,7 @@ workflow create_json_entries_wf {
         sourmash    //tuple val(fasta_basename) path(sourmash_file)
     main:
         merged_ch = abricate.join(prokka.join(sourmash)) 
-        //tuple val(fasta_basename) path(abricate_file) val(abricate_db_version) path(prokka_file) val(prokka_version) path(sourmash_file)
+        //tuple val(fasta_basename) path(abricate_file) val(abricate_db_version) path(prokka_file) val(prokka_version) path(sourmash_file) val(sourmash_version)
         
         json_report(merged_ch)
 } 
