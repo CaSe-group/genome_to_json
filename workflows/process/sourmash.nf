@@ -37,6 +37,7 @@ process sourmash_classification {
     stub:
         """
         touch ${name}_taxonomy.tsv
+        SOURMASH_VERSION=stub
         """
 }
 
