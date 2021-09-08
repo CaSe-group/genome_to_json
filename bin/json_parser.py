@@ -72,68 +72,77 @@ def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def status_parsing(OUTPUT_FILE_NAME):
+def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION, ANALYSING_DATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Status\": \"analysed\",\n")
+	RESULT_FILE.write("    \"Abricate_Info\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"        \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
+	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
+def abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RES_GENE_LIST = DF_ABRICATE['GENE'].values							#get list of all entries of 'GENE'-column in abricate-dataframe
 	if len(RES_GENE_LIST) == 0:											#check if length of the list = 0
 		RES_GENE_LIST = ['no_resistance_genes']							#if true set variable to single element list
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Resistance_Genes\": {\n")
+	RESULT_FILE.write("    \"Abricate_Result\": {\n")
 	[RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\",\n") if RES_GENE != RES_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\"\n") for RES_GENE in RES_GENE_LIST]
 	#list comprehension over all RES_GENE´s in RES_GENE_LIST -> writes '"RES_GENE": "true",' to RESULT_FILE if not last list-element; else writes '"RES_GENE": "true"' (without comma)
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION):
+def prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION, ANALYSING_DATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
+	RESULT_FILE.write("    \"Prokka_Info\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"        \"Prokka_Version\": \"{PROKKA_VERSION}\",\n")
+	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
+def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
 	if len(PROKKA_GENE_LIST) == 0:
 			PROKKA_GENE_LIST = ['no_genes_detected']
 	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)].tolist()
 	
-	STRIPPED_GENE_LIST = set()
-	for GENE in PROKKA_GENE_LIST:
-		STRIPPED_GENE_LIST.add(GENE.split('_',1)[0])	
-	STRIPPED_GENE_LIST = sorted(list(STRIPPED_GENE_LIST))
+	STRIPPED_GENE_LIST = [GENE.split('_',1)[0] for GENE in PROKKA_GENE_LIST]
+	STRIPPED_GENE_LIST = (list(dict.fromkeys(STRIPPED_GENE_LIST)))	#remove duplicates by converting list to a dict using the elements as keys (each key can only exist once) & back to list
 
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Genes\": {\n")
+	RESULT_FILE.write("    \"Prokka_Result\": {\n")
 	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != STRIPPED_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in STRIPPED_GENE_LIST]
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def prokka_version_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION):
+def sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION, ANALYSING_DATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Prokka_Version\": \"{PROKKA_VERSION}\",\n")
+	RESULT_FILE.write("    \"Sourmash_Info\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"        \"Sourmash_Version\": \"{SOURMASH_VERSION}\"\n")
+	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
+
+def sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
 	STATUS = DF_SOURMASH['status'].values[0]
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Taxonomy\": {\n")
+	RESULT_FILE.write("    \"Sourmash_Result\": {\n")
+	RESULT_FILE.write(f"        \"Status\": \"{STATUS}\",\n")
 
 	if STATUS == 'found':
-		TAX_SUPERKINGDOM = DF_SOURMASH['superkingdom'].values[0]
-		TAX_PHYLUM = DF_SOURMASH['phylum'].values[0]
-		TAX_CLASS = DF_SOURMASH['class'].values[0]
-		TAX_ORDER = DF_SOURMASH['order'].values[0]
-		TAX_FAMILY = DF_SOURMASH['family'].values[0]
-		TAX_GENUS = DF_SOURMASH['genus'].values[0]
-		TAX_SPECIES = DF_SOURMASH['species'].values[0]
-		TAX_STRAIN = DF_SOURMASH['strain'].values[0]
+		TAX_SUPERKINGDOM = str(DF_SOURMASH['superkingdom'].values[0])[3:] if str(DF_SOURMASH['superkingdom'].values[0]) != "nan" else str(DF_SOURMASH['superkingdom'].values[0])
+		TAX_PHYLUM = str(DF_SOURMASH['phylum'].values[0])[3:] if str(DF_SOURMASH['phylum'].values[0]) != "nan" else str(DF_SOURMASH['phylum'].values[0])
+		TAX_CLASS = str(DF_SOURMASH['class'].values[0])[3:] if str(DF_SOURMASH['class'].values[0]) != "nan" else str(DF_SOURMASH['class'].values[0])
+		TAX_ORDER = str(DF_SOURMASH['order'].values[0])[3:] if str(DF_SOURMASH['order'].values[0]) != "nan" else str(DF_SOURMASH['order'].values[0])
+		TAX_FAMILY = str(DF_SOURMASH['family'].values[0])[3:] if str(DF_SOURMASH['family'].values[0]) != "nan" else str(DF_SOURMASH['family'].values[0])
+		TAX_GENUS = str(DF_SOURMASH['genus'].values[0])[3:] if str(DF_SOURMASH['genus'].values[0]) != "nan" else str(DF_SOURMASH['genus'].values[0])
+		TAX_SPECIES = str(DF_SOURMASH['species'].values[0])[3:] if str(DF_SOURMASH['species'].values[0]) != "nan" else str(DF_SOURMASH['species'].values[0])
+		TAX_STRAIN = str(DF_SOURMASH['strain'].values[0])[3:] if str(DF_SOURMASH['strain'].values[0]) != "nan" else str(DF_SOURMASH['strain'].values[0])
 
 		RESULT_FILE.write(f"        \"superkingdom\": \"{TAX_SUPERKINGDOM}\",\n")
 		RESULT_FILE.write(f"        \"phylum\": \"{TAX_PHYLUM}\",\n")
@@ -154,11 +163,9 @@ def sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def analysing_date_parsing(OUTPUT_FILE_NAME):
-	DATE = os.popen('date -I | tr -d "-" |tr -d "\n"')					#create bash-output of parsed date
-	ANALYSING_DATE = DATE.read()										#interpret bash-output in python
+def status_parsing(OUTPUT_FILE_NAME):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write(f"    \"Analysing_Date\": {ANALYSING_DATE}\n") 	#no comma after this line, because last line of the file
+	RESULT_FILE.write("    \"Status\": \"analysed\"\n")	#no comma after this line, because last line of the file
 	RESULT_FILE.close()
 	return RESULT_FILE
 
@@ -172,6 +179,9 @@ def json_file_closing(OUTPUT_FILE_NAME):
 ################################################################################
 ## Function calls
 
+DATE = os.popen('date -I | tr -d "-" |tr -d "\n"')					#create bash-output of parsed date
+ANALYSING_DATE = DATE.read()										#interpret bash-output in python
+
 json_file_opening(OUTPUT_FILE_NAME)										#trigger function 'json_file_opening' with according input
 
 if NEW_ENTRY != 'false':
@@ -179,27 +189,29 @@ if NEW_ENTRY != 'false':
 else:
 	hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
 
-status_parsing(OUTPUT_FILE_NAME)
-
 if ABRICATE_INPUT != 'false':
 	ABRICATE_FILE = ABRICATE_INPUT.split(',')[0]						#split abricate-input by ',' taking the first resulting element
 	ABRICATE_DB_VERSION = ABRICATE_INPUT.split(',')[1]					#split abricate-input by ',' taking the second resulting element
 	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 	
-	res_gene_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
-	abricate_db_version_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION)
+	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION, ANALYSING_DATE)
+	abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
 
 if PROKKA_INPUT != 'false':
 	PROKKA_FILE = PROKKA_INPUT.split(',')[0]
 	PROKKA_VERSION = PROKKA_INPUT.split(',')[1]
 	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
 	
-	prokka_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
-	prokka_version_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION)
+	prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION, ANALYSING_DATE)
+	prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
 
 if SOURMASH_INPUT != 'false':
-	DF_SOURMASH = pd.read_csv(SOURMASH_INPUT)
-	sourmash_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
+	SOURMASH_FILE = SOURMASH_INPUT.split(',')[0]
+	SOURMASH_VERSION = SOURMASH_INPUT.split(',')[1]
+	DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
 
-analysing_date_parsing(OUTPUT_FILE_NAME)
+	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION, ANALYSING_DATE)
+	sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
+
+status_parsing(OUTPUT_FILE_NAME)
 json_file_closing(OUTPUT_FILE_NAME)
