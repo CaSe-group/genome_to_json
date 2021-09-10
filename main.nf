@@ -99,14 +99,14 @@ workflow {
     if ( workflow.profile.contains('test_fasta') ) { fasta_input_raw_ch =  get_fasta() }
 
     if ( params.fasta || workflow.profile.contains('test_fasta') ) {
-        collect_fasta_wf(fasta_input_raw_ch)
+        fasta_input_ch = collect_fasta_wf(fasta_input_raw_ch)
 
         if ( !params.split_fasta ) {
-            fasta_ch = fasta_input_raw_ch
+            fasta_ch = fasta_input_ch
             .map { it -> tuple(it.baseName, it) }
         }
         else {
-            fasta_ch = split_fasta(fasta_input_raw_ch)
+            fasta_ch = split_fasta(fasta_input_ch)
             .flatten()
             .map { it -> tuple(it.baseName, it) }
         }
