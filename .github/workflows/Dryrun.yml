@@ -21,3 +21,7 @@ jobs:
       run: |
           touch genome.fasta 
           ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --output new_result_dir --prokka_off
+    - name: fasta dir test
+      run: |
+          mkdir -p genomes && touch genomes/genome.fasta.gz && touch genomes/genome2.fasta.gz && touch genomes/genome3.fasta.gz 
+          ./nextflow run main.nf --fasta genomes/ -stub -profile stub --output result_dir_2
