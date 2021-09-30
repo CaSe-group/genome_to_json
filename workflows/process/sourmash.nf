@@ -55,4 +55,8 @@ process sourmash_metagenome {
         sourmash sketch dna -p scaled=10000,k=31 ${reads} -o ${name}.sig
         sourmash gather ${name}.sig ${sourmash_db} --ignore-abundance -o ${name}_composition.csv
         """
+    stub:
+        """
+        touch ${name}_composition.csv
+        """
 }
