@@ -1,0 +1,3 @@
+[submodule "submodule/rmarkdown_reports"]
+	path = submodule/rmarkdown_reports
+	url = git@github.com:CaSe-group/rmarkdown_reports.git
