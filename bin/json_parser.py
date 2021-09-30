@@ -85,6 +85,7 @@ def abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RES_GENE_LIST = DF_ABRICATE['GENE'].values							#get list of all entries of 'GENE'-column in abricate-dataframe
 	if len(RES_GENE_LIST) == 0:											#check if length of the list = 0
 		RES_GENE_LIST = ['no_resistance_genes']							#if true set variable to single element list
+	RES_GENE_LIST = list(dict.fromkeys(RES_GENE_LIST))
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Abricate_Result\": {\n")
 	[RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\",\n") if RES_GENE != RES_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\"\n") for RES_GENE in RES_GENE_LIST]
@@ -109,7 +110,7 @@ def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)].tolist()
 	
 	STRIPPED_GENE_LIST = [GENE.split('_',1)[0] for GENE in PROKKA_GENE_LIST]
-	STRIPPED_GENE_LIST = (list(dict.fromkeys(STRIPPED_GENE_LIST)))	#remove duplicates by converting list to a dict using the elements as keys (each key can only exist once) & back to list
+	STRIPPED_GENE_LIST = list(dict.fromkeys(STRIPPED_GENE_LIST))	#remove duplicates by converting list to a dict using the elements as keys (each key can only exist once) & back to list
 
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Prokka_Result\": {\n")

@@ -1,5 +1,5 @@
 include {download_db} from './process/download_db.nf'
-include {sourmash_classification; sourmash_signatures} from './process/sourmash'
+include {sourmash_classification; sourmash_signatures; sourmash_metagenome} from './process/sourmash'
 
 workflow taxonomic_classification_wf{
 	take:
@@ -8,6 +8,7 @@ workflow taxonomic_classification_wf{
 		if (!params.sourmash_off) { 
 			download_db()
 			sourmash_signatures(fasta_input)
+			sourmash_metagenome(fasta_input, download_db.out)
 			sourmash_output_ch = sourmash_classification(sourmash_signatures.out, download_db.out)
 		}
         else { sourmash_output_ch = fasta_input
