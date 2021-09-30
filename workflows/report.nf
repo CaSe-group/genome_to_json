@@ -1,8 +1,8 @@
-include { prokka_report } from './process/bandage_report'
-include { abricate_report } from './process/abricate_report'
-include { sourmash_report } from './process/sourmash_report'
-include { sample_report } from './process/sample_report'
-include { summary } from './process/summary'
+include { prokka_report } from './process/report_prokka'
+include { abricate_report } from './process/report_abricate'
+include { sourmash_report } from './process/report_sourmash'
+include { sample_report } from './process/report_sample'
+include { summary } from './process/report'
 
 
 workflow report_generation_full_wf {
@@ -30,6 +30,7 @@ workflow report_generation_full_wf {
                                     .mix(abricate_report.out)
                                     .mix(prokka_report.out)
                                     .groupTuple(by: 0)
+                                    .map{it -> tuple (it[0],it[1],it[2].flatten())}
 
             sample_report(samplereportinput.combine(sampleheaderreport))
 

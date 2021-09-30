@@ -12,5 +12,6 @@ workflow annotation_wf {
                                     .combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
         }
     emit:
-        prokka_output_ch //tuple val(fasta_basename) path(prokka_file) val(prokka_version)
+        to_json = prokka_output_ch //tuple val(fasta_basename) path(prokka_file) val(prokka_version)
+        to_report = prokka.out.prokka_to_report
 }

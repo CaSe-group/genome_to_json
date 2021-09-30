@@ -18,5 +18,6 @@ workflow taxonomic_classification_wf{
 									.combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
         }
 	emit:
-		sourmash_output_ch //tuple val(fasta_basename) path(sourmash_file) val(sourmash_version)
+		to_json=sourmash_output_ch
+		to_report=sourmash_classification.out.map{it -> tuple(it[0],it[1])}.join(sourmash_metagenome.out)
 }

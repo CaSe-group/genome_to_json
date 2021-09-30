@@ -81,6 +81,7 @@ include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
 include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
 include { taxonomic_classification_wf } from './workflows/taxonomic_classification_wf.nf'
+include { report_generation_full_wf } from './workflows/report.nf'
 
 
 /************************** 
@@ -118,7 +119,20 @@ workflow {
     taxonomic_classification_wf(fasta_ch)
 
     // 3. json-output
-    create_json_entries_wf(resistance_determination_wf.out, annotation_wf.out, taxonomic_classification_wf.out)
+    create_json_entries_wf( resistance_determination_wf.out.to_json, 
+                            annotation_wf.out.to_json, 
+                            taxonomic_classification_wf.out.to_json
+    )
+
+    // 4. report
+    if (!params.abricate_off && !params.prokka_off && !params.sourmash_off) {
+        report_generation_full_wf(  annotation_wf.out.to_report,
+                                    resistance_determination_wf.out.to_report,
+                                    taxonomic_classification_wf.out.to_report
+        )
+    }
+
+
 }
 
 
