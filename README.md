@@ -4,9 +4,9 @@
 
 
 ## ToDos
-* [ ] taxonomic determination [sourmash GTDB]
+* [X] taxonomic determination [sourmash GTDB]
 * [ ] plasmid [yes/no]
 * [x] resistance determination (e.g. abricate)
 * [x] annotation (e.g. prokka  - or one of the newer ones)
-* [ ] contamination[yes/no] yes -> with what
+* [x] contamination[yes/no] yes -> with what
 * [x] flexible multifasta input
