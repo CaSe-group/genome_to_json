@@ -1,6 +1,6 @@
 process download_db {
     label 'ubuntu'
-    storeDir 'databases/sourmash'
+    storeDir "${params.databases}/sourmash"
     
     output:
         path("*.json.gz")
