@@ -4,6 +4,6 @@ process get_fasta {
 	path("*.fasta") 
 	script:
 	"""
-    wget https://osf.io/dm93b/download -O GCA_000534275.1.fasta
+    wget  --no-check-certificate https://osf.io/dm93b/download -O GCA_000534275.1.fasta
 	"""
 }
