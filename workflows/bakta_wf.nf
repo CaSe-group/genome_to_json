@@ -20,7 +20,7 @@ workflow bakta_wf {
                                     .collectFile(name: 'bakta_dummy.txt', newLine: true)) //create & add dummy-file to the tuple
                                     .combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
         }
-        bakta.out.bakta_publish_ch.view()
+
     emit:
         to_json = bakta_json_ch 
         to_report = bakta_rep_ch
