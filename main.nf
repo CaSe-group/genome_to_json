@@ -77,6 +77,7 @@ include { split_fasta } from './modules/split_fasta.nf'
 **************************/
 
 include { annotation_wf } from './workflows/annotation_wf.nf'
+include { bakta_wf } from './workflows/bakta_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
 include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
@@ -89,7 +90,7 @@ include { report_generation_full_wf } from './workflows/report.nf'
 **************************/
 
 include { abricate } from './workflows/process/abricate.nf'
-include { prokka } from './workflows/process/prokka.nf'
+//include { prokka } from './workflows/process/prokka.nf'
 
 /************************** 
 * MAIN WORKFLOW
@@ -113,20 +114,21 @@ workflow {
         }
     }
 
-    // 2. Genome-analysis (Abricate, Prokka, Sourmash)
-    annotation_wf(fasta_ch)
+    // 2. Genome-analysis (Abricate, Bakta/Prokka, Sourmash)
+    //annotation_wf(fasta_ch)
+    bakta_wf(fasta_ch)
     resistance_determination_wf(fasta_ch)
     taxonomic_classification_wf(fasta_ch)
 
     // 3. json-output
     create_json_entries_wf( resistance_determination_wf.out.to_json, 
-                            annotation_wf.out.to_json, 
+                            bakta_wf.out.to_json, 
                             taxonomic_classification_wf.out.to_json
     )
 
     // 4. report
-    if (!params.abricate_off && !params.prokka_off && !params.sourmash_off) {
-        report_generation_full_wf(  annotation_wf.out.to_report,
+    if (!params.abricate_off && !params.bakta_off && !params.sourmash_off) {
+        report_generation_full_wf(  bakta_wf.out.to_report,
                                     resistance_determination_wf.out.to_report,
                                     taxonomic_classification_wf.out.to_report
         )
@@ -157,9 +159,11 @@ ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
-    
+    --bakta_off     turns off bakta-process
+
     --split_fasta   splits multi-line fastas into single fasta-files
     --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therefore json can be uploaded as new entry)
+    --bakta_db      path to your own bakta DB instead (.tar.gz)
 
 ${c_yellow}Test profile:${c_reset}
     [-profile]-option "test_fasta" runs the test profile using a fasta-file,
@@ -181,7 +185,7 @@ def defaultMSG() {
     \u001B[1;30m______________________________________\033[0m
     Parameters:
         \033[2mAbricate switched off:  $params.abricate_off
-        Prokka switched off:    $params.prokka_off
+        Bakta switched off:    $params.bakta_off
         Sourmash switched off:  $params.sourmash_off
 
         Split fastas:           $params.split_fasta
@@ -200,3 +204,4 @@ ________________________________________________________________________________
 ${c_green}genome_to_json${c_reset} | A Nextflow analysis workflow for fasta-genomes
     """
 }
+

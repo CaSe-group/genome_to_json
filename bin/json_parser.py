@@ -20,7 +20,7 @@ parser.add_argument('-a', '--abricate', help = "Input Abricate-file", default = 
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
 parser.add_argument('-n', '--new_entry', help = "Activates parsing of hash-ID as sample-ID", default = 'false' )
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
-parser.add_argument('-p', '--prokka', help = "Input Prokka-file", default = 'false')
+parser.add_argument('-p', '--bakta', help = "Input Bakta-file", default = 'false')
 parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'false')
 
 #parsing:
@@ -31,7 +31,7 @@ ABRICATE_INPUT = arg.abricate
 HASHID_INPUT = arg.hashid
 NEW_ENTRY = arg.new_entry
 OUTPUT_DIR = arg.output
-PROKKA_INPUT = arg.prokka
+BAKTA_INPUT = arg.bakta
 SOURMASH_INPUT = arg.sourmash
 
 
@@ -94,26 +94,25 @@ def abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION, ANALYSING_DATE):
+def bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION, ANALYSING_DATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Prokka_Info\": {\n")
+	RESULT_FILE.write("    \"Bakta_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
-	RESULT_FILE.write(f"        \"Prokka_Version\": \"{PROKKA_VERSION}\",\n")
+	RESULT_FILE.write(f"        \"Bakta_Version\": \"{BAKTA_VERSION}\",\n")
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
-	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
-	if len(PROKKA_GENE_LIST) == 0:
-			PROKKA_GENE_LIST = ['no_genes_detected']
-	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)].tolist()
+def bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA):
+	BAKTA_GENE_LIST = DF_BAKTA['Gene'].values
+	if len(BAKTA_GENE_LIST) == 0:
+			BAKTA_GENE_LIST = ['no_genes_detected']
+	BAKTA_GENE_LIST = BAKTA_GENE_LIST[~pd.isnull(BAKTA_GENE_LIST)].tolist()
 	
-	STRIPPED_GENE_LIST = [GENE.split('_',1)[0] for GENE in PROKKA_GENE_LIST]
-	STRIPPED_GENE_LIST = list(dict.fromkeys(STRIPPED_GENE_LIST))	#remove duplicates by converting list to a dict using the elements as keys (each key can only exist once) & back to list
+	STRIPPED_GENE_LIST = list(dict.fromkeys(BAKTA_GENE_LIST))	#remove duplicates by converting list to a dict using the elements as keys (each key can only exist once) & back to list
 
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
-	RESULT_FILE.write("    \"Prokka_Result\": {\n")
+	RESULT_FILE.write("    \"Bakta_Result\": {\n")
 	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != STRIPPED_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in STRIPPED_GENE_LIST]
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
@@ -198,13 +197,13 @@ if ABRICATE_INPUT != 'false':
 	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION, ANALYSING_DATE)
 	abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
 
-if PROKKA_INPUT != 'false':
-	PROKKA_FILE = PROKKA_INPUT.split(',')[0]
-	PROKKA_VERSION = PROKKA_INPUT.split(',')[1]
-	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
+if BAKTA_INPUT != 'false':
+	BAKTA_FILE = BAKTA_INPUT.split(',')[0]
+	BAKTA_VERSION = BAKTA_INPUT.split(',')[1]
+	DF_BAKTA = pd.read_csv(BAKTA_FILE, skiprows=2,sep = '\t')
 	
-	prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION, ANALYSING_DATE)
-	prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
+	bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION, ANALYSING_DATE)
+	bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA)
 
 if SOURMASH_INPUT != 'false':
 	SOURMASH_FILE = SOURMASH_INPUT.split(',')[0]
@@ -216,3 +215,4 @@ if SOURMASH_INPUT != 'false':
 
 status_parsing(OUTPUT_FILE_NAME)
 json_file_closing(OUTPUT_FILE_NAME)
+

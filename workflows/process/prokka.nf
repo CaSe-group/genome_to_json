@@ -1,3 +1,4 @@
+/* Unused - annotation pipepline is utilizing bakta now */
 process prokka {
     label 'prokka'
     publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.tsv"
@@ -19,7 +20,6 @@ process prokka {
             --quiet ${dir} \
             --cpus ${task.cpus}
     	
-        PROKKA_VERSION=\$(cat /opt/conda/pkgs/prokka*/bin/prokka | grep 'my \$VERSION =' | cut -f4 -d ' ' | tr -d '"' | tr -d ';')
         """
     stub:
         """
