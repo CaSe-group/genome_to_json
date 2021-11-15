@@ -80,6 +80,7 @@ include { annotation_wf } from './workflows/annotation_wf.nf'
 include { bakta_wf } from './workflows/bakta_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
+include { gtdb_wf } from './workflows/gtdb_wf.nf'
 include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
 include { taxonomic_classification_wf } from './workflows/taxonomic_classification_wf.nf'
 include { report_generation_full_wf } from './workflows/report.nf'
@@ -117,13 +118,15 @@ workflow {
     // 2. Genome-analysis (Abricate, Bakta/Prokka, Sourmash)
     //annotation_wf(fasta_ch)
     bakta_wf(fasta_ch)
+    gtdb_wf(fasta_ch)
     resistance_determination_wf(fasta_ch)
     taxonomic_classification_wf(fasta_ch)
 
     // 3. json-output
-    create_json_entries_wf( resistance_determination_wf.out.to_json, 
-                            bakta_wf.out.to_json, 
-                            taxonomic_classification_wf.out.to_json
+    create_json_entries_wf( resistance_determination_wf.out.to_json,
+                            bakta_wf.out.to_json,
+                            taxonomic_classification_wf.out.to_json,
+                            gtdb_wf.out.to_json
     )
 
     // 4. report

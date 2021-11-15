@@ -1,7 +1,6 @@
 process sourmash_signatures {
-    label 'sourmash'   
-    // publishDir "${params.output}/sourmash_signatures", mode:'copy', pattern: "*.sig"
-    
+        label 'sourmash'   
+        // publishDir "${params.output}/sourmash_signatures", mode:'copy', pattern: "*.sig"
     input:
         tuple val(name), path(reads)
     output:
@@ -17,9 +16,8 @@ process sourmash_signatures {
 }
 
 process sourmash_classification {
-    label 'sourmash'
-    publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_taxonomy.tsv"
-    
+        label 'sourmash'
+        publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_taxonomy.tsv"
     input:
         tuple val(name), path(signatures)
         path(sourmash_db)
@@ -42,9 +40,8 @@ process sourmash_classification {
 }
 
 process sourmash_metagenome {
-    label 'sourmash'
-    publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_composition.csv"
-    
+        label 'sourmash'
+        publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_composition.csv"
     input:
         tuple val(name), path(reads)
         path(sourmash_db)

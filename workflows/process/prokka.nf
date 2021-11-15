@@ -1,17 +1,16 @@
 /* Unused - annotation pipepline is utilizing bakta now */
 process prokka {
-    label 'prokka'
-    publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.tsv"
-    publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.gff"
-    publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.txt"
-	publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.gbk"
-
+        label 'prokka'
+        publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.tsv"
+        publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.gff"
+        publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.txt"
+        publishDir "${params.output}/${name}/${params.prokkadir}/", mode: 'copy', pattern: "${name}_prokka/${name}_prokka.gbk"
     input:
-    	tuple val(name), path(dir)
+        tuple val(name), path(dir)
     output:
-    	tuple val(name), path("${name}_prokka/${name}_prokka.tsv"), env(PROKKA_VERSION), emit: prokka_tsv_ch
-    	tuple val(name), path("${name}_prokka/${name}_prokka.gff"), emit: prokka_to_report
-    	tuple val(name), path("${name}_prokka/${name}_prokka.*"), emit: prokka_working_ch
+        tuple val(name), path("${name}_prokka/${name}_prokka.tsv"), env(PROKKA_VERSION), emit: prokka_tsv_ch
+        tuple val(name), path("${name}_prokka/${name}_prokka.gff"), emit: prokka_to_report
+        tuple val(name), path("${name}_prokka/${name}_prokka.*"), emit: prokka_working_ch
     script:
     	"""
     	prokka --compliant --fast\
@@ -19,7 +18,6 @@ process prokka {
             --prefix "${name}_prokka" \
             --quiet ${dir} \
             --cpus ${task.cpus}
-    	
         """
     stub:
         """

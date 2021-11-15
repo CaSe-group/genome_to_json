@@ -1,5 +1,5 @@
 process abricate_report {
-        label 'ubuntu'  
+        label 'ubuntu'
     input:
         tuple val(name), path(input), path(markdown)
     output:

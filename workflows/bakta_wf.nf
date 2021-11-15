@@ -1,12 +1,11 @@
 include { bakta } from './process/bakta.nf'
-include { bakta_database } from './process/bakta_database.nf'
-
+include { bakta_db_download } from './process/bakta_db_download.nf'
 
 workflow bakta_wf {
     take:   fasta_input
     main:   
             if (params.bakta_db) { database_bakta = file(params.bakta_db) }
-            else if ( !params.bakta_db ) { database_bakta = bakta_database() }
+            else if ( !params.bakta_db ) { database_bakta = bakta_db_download() }
                        
             if (!params.bakta_off) { bakta(fasta_input,database_bakta) ; bakta_rep_ch = bakta.out.bakta_report_ch ; bakta_json_ch = bakta.out.bakta_json_ch }
             else { bakta_output_ch = fasta_input

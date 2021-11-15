@@ -1,0 +1,14 @@
+process bakta_db_download {
+        label 'ubuntu'
+        storeDir "${params.databases}/bakta"
+    output:
+        path("db.tar.gz")
+    script:
+        """
+        wget --no-check-certificate https://zenodo.org/record/5215743/files/db.tar.gz
+        """
+    stub:
+        """
+        touch db.tar.gz
+        """
+    }

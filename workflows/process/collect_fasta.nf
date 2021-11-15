@@ -1,5 +1,5 @@
 process collect_fasta {
-    label 'ubuntu'
+        label 'ubuntu'
     input:
         path(input_path)
     output:

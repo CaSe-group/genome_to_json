@@ -1,9 +1,8 @@
 process abricate {
-    label 'abricate'
-    publishDir "${params.output}/${name}/${params.abricatedir}/", mode: 'copy', pattern: '*.tsv'
-    errorStrategy 'retry'
-        maxRetries 5
-
+        label 'abricate'
+        publishDir "${params.output}/${name}/${params.abricatedir}/", mode: 'copy', pattern: '*.tsv'
+        errorStrategy 'retry'
+            maxRetries 5
     input:
         tuple val(name), path(dir)
         each abricate_db
