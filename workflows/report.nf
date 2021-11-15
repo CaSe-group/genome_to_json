@@ -23,14 +23,48 @@ workflow report_generation_full_wf {
             sourmash_report(sourmash_report_ch.combine(sourmashreport))
             abricate_report(abricate_report_ch.combine(abricatereport))
             bakta_report(bakta_report_ch.combine(baktareport))
-            
+        
+
+        //alternative approach
+            def tool_list = []
+
+            if ( !params.abricate_off) {
+                abricatereport=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/abricate.Rmd", checkIfExists: true)
+                abricate_report(abricate_report_ch.combine(abricatereport))
+                tool_list.add("abricate_report.out")
+            }
+            if ( !params.bacta_off) {
+                baktareport=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/bakta.Rmd", checkIfExists: true)
+                bakta_report(bakta_report_ch.combine(baktareport))
+                tool_list.add("bacta_report.out")
+            }
+            if ( !params.prokka_off) {
+                prokkareport=
+                prokka_report()
+                tool_list.add("prokka_report.out")
+            }
+            if ( !params.sourmash_off) {
+                sourmashreport=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/sourmash.Rmd", checkIfExists: true)
+                sourmash_report(sourmash_report_ch.combine(sourmashreport))
+                tool_list.add("sourmash_report.out")
+            }
+
         // 2 collect tool reports PER sample (add new via .mix(NAME_report.out))
+            tool_list.each {
+                if ( tool_list.indexOf($it) == 0) {
+                    samplereportinput = $it.out
+                }
+                else {
+                    samplereportinput = samplereportinput
+                                        .mix($it.out)
+                }
+            
             samplereportinput =     sourmash_report.out
-                                    .mix(abricate_report.out)
+                                    .mix(abricate_report.out)// maybe loop here? if tool active add to a list and than loop through list
                                     .mix(bakta_report.out)
                                     .groupTuple(by: 0)
                                     .map{it -> tuple (it[0],it[1],it[2].flatten())}
-
+            samplereportinput.view()
             sample_report(samplereportinput.combine(sampleheaderreport))
 
 
