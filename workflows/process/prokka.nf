@@ -10,7 +10,7 @@ process prokka {
     	tuple val(name), path(dir)
     output:
     	tuple val(name), path("${name}_prokka/${name}_prokka.tsv"), env(PROKKA_VERSION), emit: prokka_tsv_ch
-    	tuple val(name), path("${name}_prokka/${name}_prokka.gff"), emit: prokka_to_report
+    	tuple val(name), path("${name}_prokka/${name}_prokka.gff"), emit: prokka_report_ch
     	tuple val(name), path("${name}_prokka/${name}_prokka.*"), emit: prokka_working_ch
     script:
     	"""

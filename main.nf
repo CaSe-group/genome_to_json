@@ -46,6 +46,10 @@ if (!workflow.profile.contains('test_fasta') && !params.fasta) { exit 1, "Input 
 // check that input params are used as such
 if (params.fasta == true) { exit 5, "Please provide a fasta file via [--fasta]" }
 
+// check that at least one tool is active
+if (params.abricate_off && params.bakta_off && params.prokka_off && params.sourmash_off) {
+    exit 6, "All tools deactivated. Please activate at least on tool"
+}
 
 /************************** 
 * INPUTs
@@ -76,13 +80,13 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-include { annotation_wf } from './workflows/annotation_wf.nf'
+include { abricate_wf } from './workflows/abricate_wf.nf'
 include { bakta_wf } from './workflows/bakta_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
-include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
-include { taxonomic_classification_wf } from './workflows/taxonomic_classification_wf.nf'
-include { report_generation_full_wf } from './workflows/report.nf'
+include { prokka_wf } from './workflows/prokka_wf.nf'
+include { report_generation_full_wf } from './workflows/report_wf.nf'
+include { sourmash_wf } from './workflows/sourmash_wf.nf'
 
 
 /************************** 
@@ -114,25 +118,26 @@ workflow {
         }
     }
 
-    // 2. Genome-analysis (Abricate, Bakta/Prokka, Sourmash)
-    //annotation_wf(fasta_ch)
-    bakta_wf(fasta_ch)
-    resistance_determination_wf(fasta_ch)
-    taxonomic_classification_wf(fasta_ch)
+    // 2. Genome-analysis (Abricate, Bakta, Prokka, Sourmash)
+    abricate_wf(fasta_ch) // Resistance-determination
+    bakta_wf(fasta_ch) // Annotation
+    prokka_wf(fasta_ch) // Annotation
+    sourmash_wf(fasta_ch) // Taxonomic-classification
 
     // 3. json-output
-    create_json_entries_wf( resistance_determination_wf.out.to_json, 
-                            bakta_wf.out.to_json, 
-                            taxonomic_classification_wf.out.to_json
+    create_json_entries_wf( abricate_wf.out.to_json, 
+                            bakta_wf.out.to_json,
+                            prokka_wf.out.to_json,
+                            sourmash_wf.out.to_json
     )
 
     // 4. report
-    if (!params.abricate_off && !params.bakta_off && !params.sourmash_off) {
-        report_generation_full_wf(  bakta_wf.out.to_report,
-                                    resistance_determination_wf.out.to_report,
-                                    taxonomic_classification_wf.out.to_report
-        )
-    }
+    report_generation_full_wf( 
+        abricate_wf.out.to_report,
+        bakta_wf.out.to_report,
+        prokka_wf.out.to_report,
+        sourmash_wf.out.to_report
+    )
 
 
 }

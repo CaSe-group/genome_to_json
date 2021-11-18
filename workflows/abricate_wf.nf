@@ -1,6 +1,6 @@
 include { abricate } from './process/abricate.nf'
 
-workflow resistance_determination_wf {
+workflow abricate_wf {
     take: 
         fasta_input //tuple val(fasta_basename) path(fasta_file)
     main:
@@ -16,6 +16,6 @@ workflow resistance_determination_wf {
                                     .combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
         }
     emit:
-        to_json = abricate_output_ch //tuple val(fasta_basename) path(abricate_file) val(abricate_db_version)
-        to_report = abricate_output_ch.map{ it -> tuple (it[0], it[1])} //tuple val(fasta_basename) path(abricate_file)
+        to_json = abricate_output_ch //tuple val(fasta_basename) path(fasta_basename_ncbi.tsv) val(abricate_db_version)
+        to_report = abricate_output_ch.map{ it -> tuple (it[0], it[1])} //tuple val(fasta_basename) path(fasta_basename_ncbi.tsv)
 }

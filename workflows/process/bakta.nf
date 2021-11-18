@@ -20,6 +20,16 @@ process bakta {
 
       BAKTA_VERSION=\$(bakta --version | cut -d' ' -f2-)
       """
+    stub:
+        """
+        mkdir ${name}
+        mkdir ${name}-results
+        
+        touch ${name}/2.bakta
+        touch ${name}-results/${name}.gff3
+        touch ${name}-results/${name}.tsv
+        
+        BAKTA_VERSION=stub
+        """
 }
-
 
