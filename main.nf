@@ -44,11 +44,11 @@ if (params.profile) { exit 1, "--profile is WRONG use -profile" }
 if (!workflow.profile.contains('test_fasta') && !params.fasta) { exit 1, "Input missing, use [--fasta]" }
 
 // check that input params are used as such
-if (params.fasta == true) { exit 5, "Please provide a fasta file via [--fasta]" }
+if (params.fasta == true) { exit 2, "Please provide a fasta file via [--fasta]" }
 
 // check that at least one tool is active
 if (params.abricate_off && params.bakta_off && params.prokka_off && params.sourmash_off) {
-    exit 6, "All tools deactivated. Please activate at least on tool"
+    exit 3, "All tools deactivated. Please activate at least on tool"
 }
 
 /************************** 
