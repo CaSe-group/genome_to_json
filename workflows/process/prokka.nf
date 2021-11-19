@@ -19,7 +19,8 @@ process prokka {
             --prefix "${name}_prokka" \
             --quiet ${dir} \
             --cpus ${task.cpus}
-    	
+
+        PROKKA_VERSION=test
         """
     stub:
         """
