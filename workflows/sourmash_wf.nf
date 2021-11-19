@@ -8,7 +8,7 @@ workflow sourmash_wf{
 		if (!params.sourmash_off) { 
 			download_db()
 			sourmash_signatures(fasta_input)
-			sourmash_classification_ch = sourmash_classification(sourmash_signatures.out, download_db.out)
+			sourmash_taxonomy_ch = sourmash_classification(sourmash_signatures.out, download_db.out)
 			sorumash_metagenome_ch = sourmash_metagenome(fasta_input, download_db.out)
 		}
         else { sourmash_taxonomy_ch = fasta_input
