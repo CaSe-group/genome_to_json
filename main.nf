@@ -162,13 +162,13 @@ ${c_yellow}Input:${c_reset}
     
 ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
+    --bakta_off     turns off bakta-process
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
-    --bakta_off     turns off bakta-process
 
-    --split_fasta   splits multi-line fastas into single fasta-files
-    --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therefore json can be uploaded as new entry)
     --bakta_db      path to your own bakta DB instead (.tar.gz)
+    --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therefore json can be uploaded as new entry)
+    --split_fasta   splits multi-line fastas into single fasta-files
 
 ${c_yellow}Test profile:${c_reset}
     [-profile]-option "test_fasta" runs the test profile using a fasta-file,
@@ -191,6 +191,7 @@ def defaultMSG() {
     Parameters:
         \033[2mAbricate switched off:  $params.abricate_off
         Bakta switched off:    $params.bakta_off
+        Prokka switched off:    $params.prokka_off
         Sourmash switched off:  $params.sourmash_off
 
         Split fastas:           $params.split_fasta
