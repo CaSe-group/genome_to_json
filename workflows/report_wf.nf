@@ -43,6 +43,24 @@ workflow report_generation_full_wf {
                 tool_list.add(sourmash_report.out)
             }
 
+        //idea for simplifed code:
+            //def tool_list = [abricate, bakta, prokka, sourmash] //eventually as param in config?
+            //tool_list.eachWithIndex { tool, index ->
+                //if ( !params.${tool}_off) {
+                //    ${tool}report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
+                //    ${tool}_report(${tool}_report_ch.combine(${tool}report))
+                //    tool_list.add(${tool}_report.out)
+                //
+                //    if ( index == 0) { //need here another check if first tool in tool-list is deactivated -> so first acitve tool
+                //    samplereportinput = ${tool}_report.out //if its the first element of the list open a new channel containing the element
+                //    }
+                //    else {
+                //        samplereportinput = samplereportinput
+                //                            .mix(${tool}_report.out) //if its not the first list-element add it to the created channel
+                //    }
+                //}
+            //}
+
         // 2 collect tool reports PER sample (add new via .mix(NAME_report.out))
             tool_list.eachWithIndex { element, index -> //loop over each element of the list getting the element itself and its index
                 if ( index == 0) {
