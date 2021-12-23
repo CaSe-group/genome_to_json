@@ -85,7 +85,7 @@ include { bakta_wf } from './workflows/bakta_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
 include { prokka_wf } from './workflows/prokka_wf.nf'
-include { report_generation_full_wf } from './workflows/report_wf.nf'
+//include { report_generation_full_wf } from './workflows/report_wf.nf'
 include { sourmash_wf } from './workflows/sourmash_wf.nf'
 
 
@@ -109,12 +109,12 @@ workflow {
 
         if ( !params.split_fasta ) {
             fasta_ch = fasta_input_ch
-            .map { it -> tuple(it.baseName, it) }
+                        .map { it -> tuple(it.baseName, it) }
         }
         else {
             fasta_ch = split_fasta(fasta_input_ch)
-            .flatten()
-            .map { it -> tuple(it.baseName, it) }
+                        .flatten()
+                        .map { it -> tuple(it.baseName, it) }
         }
     }
 
@@ -125,19 +125,20 @@ workflow {
     sourmash_wf(fasta_ch) // Taxonomic-classification
 
     // 3. json-output
-    create_json_entries_wf( abricate_wf.out.to_json, 
-                            bakta_wf.out.to_json,
-                            prokka_wf.out.to_json,
-                            sourmash_wf.out.to_json
+    create_json_entries_wf( 
+       abricate_wf.out.to_json,
+        bakta_wf.out.to_json,
+        prokka_wf.out.to_json,
+        sourmash_wf.out.to_json,
     )
 
     // 4. report
-    report_generation_full_wf( 
-        abricate_wf.out.to_report,
-        bakta_wf.out.to_report,
-        prokka_wf.out.to_report,
-        sourmash_wf.out.to_report
-    )
+    //report_generation_full_wf( 
+    //    abricate_wf.out.to_report,
+    //    bakta_wf.out.to_report,
+    //    prokka_wf.out.to_report,
+    //    sourmash_wf.out.to_report,
+    //)
 
 
 }
