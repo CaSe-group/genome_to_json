@@ -18,26 +18,26 @@ process sourmash_signatures {
 
 process sourmash_classification {
     label 'sourmash'
-    publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_taxonomy.tsv"
+    publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_sourmash_taxonomy.tsv"
     
     input:
         tuple val(name), path(signatures)
         path(sourmash_db)
     output: 
-        tuple val(name), path("${name}_taxonomy.tsv"), env(SOURMASH_VERSION)
+        tuple val(name), path("${name}_sourmash_taxonomy.tsv"), env(SOURMASH_VERSION)
     script:
         """
         sourmash lca classify \
             --db ${sourmash_db} \
             --query ${signatures} \
-            > ${name}_taxonomy.tsv
+            > ${name}_sourmash_taxonomy.tsv
 
-        SOURMASH_VERSION=\$(sourmash --version | cut -f 2 -d ' ') 
+        sourmash --version | cut -f 2 -d ' ' >> sourmash_version.txt
         """  
     stub:
         """
-        touch ${name}_taxonomy.tsv
-        SOURMASH_VERSION=stub
+        touch ${name}_sourmash_taxonomy.tsv \
+            sourmash_version.txt
         """
 }
 

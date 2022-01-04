@@ -7,9 +7,8 @@ workflow create_json_entries_wf {
         prokka      //tuple val(fasta_basename) path(prokka_file) val(prokka_version)
         sourmash    //tuple val(fasta_basename) path(sourmash_file)
     main:
-        merged_ch = abricate.mix(bakta, prokka, sourmash).groupTuple(by: 0).map{ it -> tuple (it[0],it[1],it[2]).flatten() }
+        merged_ch = abricate.mix(bakta, prokka, sourmash).groupTuple(by: 0).map{ it -> tuple (it[0], tuple (it[1],it[2]).flatten()) }
         merged_ch.view()
-        //tuple val(fasta_basename) path(abricate_file) val(abricate_db_version) path(bakta_file) val(bakta_version) path(prokka_file) val(prokka_version) path(sourmash_file) val(sourmash_version)
+        //tuple val(fasta_basename) path(analysis_result_files)
         //json_report(merged_ch)
-} 
-
+}

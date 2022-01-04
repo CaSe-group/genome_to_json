@@ -3,7 +3,7 @@ include {sourmash_classification; sourmash_signatures; sourmash_metagenome} from
 
 workflow sourmash_wf{
 	take:
-		fasta_input //tuple val(fasta_basename) path(fasta_file)
+		fasta_input //tuple val(fasta-basename) path(fasta-file)
 	main:
 		if (!params.sourmash_off) { 
 			download_db()
@@ -12,9 +12,9 @@ workflow sourmash_wf{
 			sourmash_metagenome_ch = sourmash_metagenome(fasta_input, download_db.out)
 		}
         else { sourmash_taxonomy_ch = Channel.empty()
-                sourmash_metagenome_ch = Channel.empty()
+            sourmash_metagenome_ch = Channel.empty()
         }
     emit:
-        to_json = sourmash_taxonomy_ch //tuple val(fasta_basename), path(fasta_basename_taxonomy.tsv), env(sourmash_version)
-        to_report = sourmash_taxonomy_ch.map{it -> tuple(it[0],it[1])}.join(sourmash_metagenome_ch) //tuple val(fasta_basename), path(fasta_basename_taxonomy.tsv), path(fasta_basename_composition.csv)
+        to_json = sourmash_taxonomy_ch //tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(sourmash_version.txt)
+        to_report = sourmash_taxonomy_ch.map{it -> tuple(it[0],it[1])}.join(sourmash_metagenome_ch) //tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(fasta-basename_composition.csv)
 }

@@ -2,7 +2,7 @@ include { abricate } from './process/abricate.nf'
 
 workflow abricate_wf {
     take: 
-        fasta_input //tuple val(fasta_basename) path(fasta_file)
+        fasta_input //tuple val(fasta-basename) path(fasta-file)
     main:
         if (!params.abricate_off) {
             abricate_db = ['ncbi', 'card', 'vfdb', 'ecoh', 'argannot', 'plasmidfinder', 'resfinder']
@@ -17,6 +17,6 @@ workflow abricate_wf {
                                     //.combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
         }
     emit:
-        to_json = abricate_output_ch //tuple val(fasta_basename) path(fasta_basename_ncbi.tsv) val(abricate_db_version)
-        to_report = abricate_output_ch.map{ it -> tuple (it[0], it[1])} //tuple val(fasta_basename) path(fasta_basename_ncbi.tsv)
+        to_json = abricate_output_ch //tuple val(fasta-basename) path(fasta-basename_abricate_ncbi.tsv) path(abricate_ncbi_version.txt)
+        to_report = abricate_output_ch.map{ it -> tuple (it[0], it[1])} //tuple val(fasta-basename) path(fasta-basename_abricate_ncbi.tsv)
 }

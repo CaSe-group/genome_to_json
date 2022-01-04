@@ -4,20 +4,20 @@ process json_report {
         label 'python3'
     
     input:
-        tuple val(name), path(abricate_result), val(abricate_db_version), path(bakta_result), val(bakta_version), path(prokka_result), val(prokka_version), path(sourmash_result), val(sourmash_version)
+        tuple val(name) path(files)
     output:
 	    tuple val(name), path("*.json")
     script:
-        if ( !params.abricate_off) { abricate_input = "${abricate_result},${abricate_db_version}" }
+        if ( !params.abricate_off) { abricate_input = "*abricate_ncbi.tsv,abricate_ncbi_version.txt" }
         else { abricate_input = "false" }
 
-        if ( !params.bakta_off) { bakta_input = "${bakta_result},${bakta_version}" }
+        if ( !params.bakta_off) { bakta_input = "*_bakta.tsv,bakta_version.txt" }
         else { bakta_input = "false" }
 
-        if ( !params.prokka_off) { prokka_input = "${prokka_result},${prokka_version}"}
+        if ( !params.prokka_off) { prokka_input = "*_prokka.tsv,prokka_version.txt"}
         else { prokka_input = "false" }
 
-        if ( !params.sourmash_off) { sourmash_input = "${sourmash_result},${sourmash_version}" }
+        if ( !params.sourmash_off) { sourmash_input = "*_taxonomy.tsv,sourmash_version.txt" }
         else { sourmash_input = "false" }
 
         """
