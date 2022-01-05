@@ -14,7 +14,7 @@ process bakta {
         rm ${database}
 
         amrfinder_update --force_update --database db/amrfinderplus-db/
-        bakta --output \$PWD --prefix ${name}_bakta --db \$PWD/db--threads ${task.cpus} ${fasta}
+        bakta --output \$PWD --prefix ${name}_bakta --db \$PWD/db --threads ${task.cpus} ${fasta}
 
         # reduce fingerprint on local systems
         rm -rf db

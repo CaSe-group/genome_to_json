@@ -24,7 +24,7 @@ process sourmash_classification {
         tuple val(name), path(signatures)
         path(sourmash_db)
     output: 
-        tuple val(name), path("${name}_sourmash_taxonomy.tsv"), env(SOURMASH_VERSION)
+        tuple val(name), path("${name}_sourmash_taxonomy.tsv"), path("sourmash_version.txt")
     script:
         """
         sourmash lca classify \
@@ -49,15 +49,14 @@ process sourmash_metagenome {
         tuple val(name), path(reads)
         path(sourmash_db)
     output:
-        tuple val(name), path("*_composition.csv")
+        tuple val(name), path("*_sourmash_composition.csv")
     script:
         """    
-        touch ${name}_composition.csv
-        sourmash sketch dna -p scaled=1000,k=31 ${reads} -o ${name}.sig || true
-        sourmash gather ${name}.sig ${sourmash_db} --ignore-abundance -o ${name}_composition.csv || true
+        sourmash sketch dna -p scaled=1000,k=31 ${reads} -o ${name}_sourmash.sig
+        sourmash gather ${name}_sourmash.sig ${sourmash_db} --ignore-abundance -o ${name}_sourmash_composition.csv
         """
     stub:
         """
-        touch ${name}_composition.csv
+        touch ${name}_sourmash_composition.csv
         """
 }

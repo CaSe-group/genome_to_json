@@ -85,7 +85,7 @@ include { bakta_wf } from './workflows/bakta_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
 include { prokka_wf } from './workflows/prokka_wf.nf'
-//include { report_generation_full_wf } from './workflows/report_wf.nf'
+include { report_generation_full_wf } from './workflows/report_wf.nf'
 include { sourmash_wf } from './workflows/sourmash_wf.nf'
 
 
@@ -133,12 +133,12 @@ workflow {
     )
 
     // 4. report
-    //report_generation_full_wf( 
-    //    abricate_wf.out.to_report,
-    //    bakta_wf.out.to_report,
-    //    prokka_wf.out.to_report,
-    //    sourmash_wf.out.to_report,
-    //)
+    report_generation_full_wf( 
+        abricate_wf.out.to_report,
+        bakta_wf.out.to_report,
+        prokka_wf.out.to_report,
+        sourmash_wf.out.to_report,
+    )
 
 
 }
