@@ -8,7 +8,7 @@ workflow create_json_entries_wf {
         sourmash    //tuple val(fasta-basename) path(sourmash_file) path(sourmash_version.txt)
     main:
         merged_ch = abricate.mix(bakta, prokka, sourmash).groupTuple(by: 0).map{ it -> tuple (it[0], tuple (it[1],it[2]).flatten()) }
-        merged_ch.view()
+        //merged_ch.view()
         //tuple val(fasta-basename) path(analysis_result-files)
         json_report(merged_ch)
 }
