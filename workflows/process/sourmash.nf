@@ -24,19 +24,19 @@ process sourmash_classification {
         tuple val(name), path(signatures)
         path(sourmash_db)
     output: 
-        tuple val(name), path("${name}_sourmash_taxonomy.tsv"), path("sourmash_version.txt")
+        tuple val(name), path("${name}_sourmash_taxonomy.csv"), path("sourmash_version.txt")
     script:
         """
         sourmash lca classify \
             --db ${sourmash_db} \
             --query ${signatures} \
-            > ${name}_sourmash_taxonomy.tsv
+            > ${name}_sourmash_taxonomy.csv
 
         sourmash --version | cut -f 2 -d ' ' >> sourmash_version.txt
         """  
     stub:
         """
-        touch ${name}_sourmash_taxonomy.tsv \
+        touch ${name}_sourmash_taxonomy.csv \
             sourmash_version.txt
         """
 }

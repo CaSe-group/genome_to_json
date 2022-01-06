@@ -19,7 +19,7 @@ process bakta {
         # reduce fingerprint on local systems
         rm -rf db
 
-        bakta --version | cut -d' ' -f2- >> bakta_version.txt
+        bakta --version | cut -d ' ' -f2- >> bakta_version.txt
         """
     stub:
         """

@@ -77,7 +77,7 @@ def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	return RESULT_FILE
 
 def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE):
-	ABRICATE_DB_VERSION = open(f"{ABRICATE_DB_VERSION_FILE}", "r").read()
+	ABRICATE_DB_VERSION = open(f"{ABRICATE_DB_VERSION_FILE}", "r").read().replace("\n","")
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Abricate_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -100,7 +100,7 @@ def abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	return RESULT_FILE
 
 def bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE):
-	BAKTA_VERSION = open(f"{BAKTA_VERSION_FILE}", "r").read()
+	BAKTA_VERSION = open(f"{BAKTA_VERSION_FILE}", "r").read().replace("\n","")
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Bakta_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -125,7 +125,7 @@ def bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA):
 	return RESULT_FILE
 
 def prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION_FILE, ANALYSING_DATE):
-	PROKKA_VERSION = open(f"{PROKKA_VERSION_FILE}", "r").read()
+	PROKKA_VERSION = open(f"{PROKKA_VERSION_FILE}", "r").read().replace("\n","")
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Prokka_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -148,7 +148,7 @@ def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	return RESULT_FILE
 
 def sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE):
-	SOURMASH_VERSION = open(f"{SOURMASH_VERSION_FILE}", "r").read()
+	SOURMASH_VERSION = open(f"{SOURMASH_VERSION_FILE}", "r").read().replace("\n","")
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Sourmash_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -246,11 +246,10 @@ if PROKKA_INPUT != 'false':
 if SOURMASH_INPUT != 'false':
 	SOURMASH_FILE = glob(SOURMASH_INPUT.split(',')[0])[0]
 	SOURMASH_VERSION_FILE = glob(SOURMASH_INPUT.split(',')[1])[0]
-	DF_SOURMASH = pd.read_csv(SOURMASH_FILE, sep = '\t')
+	DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
 
 	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE)
 	sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 
 status_parsing(OUTPUT_FILE_NAME)
 json_file_closing(OUTPUT_FILE_NAME)
-

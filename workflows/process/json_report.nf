@@ -19,7 +19,7 @@ process json_report {
         if ( !params.prokka_off) { prokka_input = "*_prokka.tsv,*prokka_version.txt"}
         else { prokka_input = "false" }
 
-        if ( !params.sourmash_off) { sourmash_input = "*_sourmash_taxonomy.tsv,*sourmash_version.txt" }
+        if ( !params.sourmash_off) { sourmash_input = "*_sourmash_taxonomy.csv,*sourmash_version.txt" }
         else { sourmash_input = "false" }
      
         """

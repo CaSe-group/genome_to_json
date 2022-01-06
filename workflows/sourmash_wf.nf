@@ -15,6 +15,6 @@ workflow sourmash_wf{
             sourmash_metagenome_ch = Channel.empty()
         }
     emit:
-        to_json = sourmash_taxonomy_ch //tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(sourmash_version.txt)
+        to_json = sourmash_taxonomy_ch //tuple val(fasta-basename), path(fasta-basename_taxonomy.csv), path(sourmash_version.txt)
         to_report = sourmash_taxonomy_ch.map{it -> tuple(it[0],it[1])}.join(sourmash_metagenome_ch) //tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(fasta-basename_composition.csv)
 }
