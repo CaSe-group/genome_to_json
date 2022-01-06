@@ -1,18 +1,21 @@
 process bakta_report {
         label 'ubuntu'  
     input:
-        tuple val(name), path(input), val(version), val(resultspath), path(markdown)
+        tuple val(name), path(input), path(version), val(resultspath), path(markdown)
     output:
         tuple val(name), path("${name}_report_bakta.Rmd"), path("${name}_report_bakta.input")
     script:
         """
         # rename input file to avoid collisions later (needs to be ".input")
         cp ${input} ${name}_report_bakta.input
+        
+        # get version-number from version-file
+        BAKTA_VERSION=\$(cat ${version}) 
         # add inputfile name and sample name to markdown template
         sed -e 's/#RESULTSENV#/${name}_report_bakta.input/g' ${markdown} | \
         sed -e 's/#NAMEENV#/${name}/g' | \
         sed -e 's@#PATHENV#@${resultspath}@g' | \
-        sed -e 's/#VERSIONENV#/${version}/g'  > ${name}_report_bakta.Rmd
+        sed -e 's/#VERSIONENV#/\${BAKTA_VERSION}/g'  > ${name}_report_bakta.Rmd
         """
     stub:
         """

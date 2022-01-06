@@ -126,10 +126,10 @@ workflow {
 
     // 3. json-output
     create_json_entries_wf( 
-       abricate_wf.out.to_json,
+        abricate_wf.out.to_json,
         bakta_wf.out.to_json,
         prokka_wf.out.to_json,
-        sourmash_wf.out.to_json,
+        sourmash_wf.out.to_json
     )
 
     // 4. report
@@ -137,7 +137,7 @@ workflow {
         abricate_wf.out.to_report,
         bakta_wf.out.to_report,
         prokka_wf.out.to_report,
-        sourmash_wf.out.to_report,
+        sourmash_wf.out.to_report
     )
 
 

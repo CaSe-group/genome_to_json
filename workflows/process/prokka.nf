@@ -21,7 +21,7 @@ process prokka {
             --quiet ${dir} \
             --cpus ${task.cpus}
 
-        echo "test" >> prokka_version.txt
+        prokka --version >> prokka_version.txt
         """
     stub:
         """

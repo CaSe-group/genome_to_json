@@ -3,6 +3,8 @@
 ################################################################################
 ## Module-import
 
+from glob import glob
+
 import argparse
 import pandas as pd
 import numpy as np
@@ -16,22 +18,24 @@ import sys
 parser = argparse.ArgumentParser(description = 'Create json-file for upload to MongoDB from different result-files.')
 
 #define arguments
-parser.add_argument('-a', '--abricate', help = "Input Abricate-file", default = 'False')
+parser.add_argument('-a', '--abricate', help = "Input Abricate-files", default = 'false')
+parser.add_argument('-b', '--bakta', help = "Input Bakta-files", default = 'false')
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
 parser.add_argument('-n', '--new_entry', help = "Activates parsing of hash-ID as sample-ID", default = 'false' )
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
-parser.add_argument('-p', '--bakta', help = "Input Bakta-file", default = 'false')
-parser.add_argument('-s', '--sourmash', help = "Input Sourmash-file", default = 'false')
+parser.add_argument('-p', '--prokka', help = "Input Prokka-files", default = 'false')
+parser.add_argument('-s', '--sourmash', help = "Input Sourmash-files", default = 'false')
 
 #parsing:
 arg = parser.parse_args()
 
 #set arguments as variables:
 ABRICATE_INPUT = arg.abricate
+BAKTA_INPUT = arg.bakta
 HASHID_INPUT = arg.hashid
 NEW_ENTRY = arg.new_entry
 OUTPUT_DIR = arg.output
-BAKTA_INPUT = arg.bakta
+PROKKA_INPUT = arg.prokka
 SOURMASH_INPUT = arg.sourmash
 
 
@@ -72,7 +76,8 @@ def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION, ANALYSING_DATE):
+def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE):
+	ABRICATE_DB_VERSION = open(f"{ABRICATE_DB_VERSION_FILE}", "r").read()
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Abricate_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -94,7 +99,8 @@ def abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION, ANALYSING_DATE):
+def bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE):
+	BAKTA_VERSION = open(f"{BAKTA_VERSION_FILE}", "r").read()
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Bakta_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -118,7 +124,31 @@ def bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION, ANALYSING_DATE):
+def prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION_FILE, ANALYSING_DATE):
+	PROKKA_VERSION = open(f"{PROKKA_VERSION_FILE}", "r").read()
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("    \"Prokka_Info\": {\n")
+	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"        \"Prokka_Version\": \"{PROKKA_VERSION}\"\n")
+	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
+	PROKKA_GENE_LIST = DF_PROKKA['gene'].values
+	if len(PROKKA_GENE_LIST) == 0:
+			PROKKA_GENE_LIST = ['no_genes_detected']
+	PROKKA_GENE_LIST = PROKKA_GENE_LIST[~pd.isnull(PROKKA_GENE_LIST)]	#select all elements from PROKKA_GENE_LIST that are not null
+	PROKKA_GENE_LIST = np.unique(PROKKA_GENE_LIST)						#remove duplicates from PROKKA_GENE_LIST
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("    \"Genes\": {\n")
+	[RESULT_FILE.write(f"        \"{GENE}\": \"true\",\n") if GENE != PROKKA_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{GENE}\": \"true\"\n") for GENE in PROKKA_GENE_LIST]
+	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+def sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE):
+	SOURMASH_VERSION = open(f"{SOURMASH_VERSION_FILE}", "r").read()
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Sourmash_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -190,27 +220,35 @@ else:
 	hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
 
 if ABRICATE_INPUT != 'false':
-	ABRICATE_FILE = ABRICATE_INPUT.split(',')[0]						#split abricate-input by ',' taking the first resulting element
-	ABRICATE_DB_VERSION = ABRICATE_INPUT.split(',')[1]					#split abricate-input by ',' taking the second resulting element
+	ABRICATE_FILE = glob(ABRICATE_INPUT.split(',')[0])[0]				#split abricate-input by ',' taking the first resulting element -> glob expands the wildcard "*", choosing the first result
+	ABRICATE_DB_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]	#split abricate-input by ',' taking the second resulting element -> glob expands the wildcard "*", choosing the first result
 	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 	
-	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION, ANALYSING_DATE)
+	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE)
 	abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
 
 if BAKTA_INPUT != 'false':
-	BAKTA_FILE = BAKTA_INPUT.split(',')[0]
-	BAKTA_VERSION = BAKTA_INPUT.split(',')[1]
-	DF_BAKTA = pd.read_csv(BAKTA_FILE, skiprows=2,sep = '\t')
+	BAKTA_FILE = glob(BAKTA_INPUT.split(',')[0])[0]
+	BAKTA_VERSION_FILE = glob(BAKTA_INPUT.split(',')[1])[0]
+	DF_BAKTA = pd.read_csv(BAKTA_FILE, skiprows=2, sep = '\t')
 	
-	bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION, ANALYSING_DATE)
+	bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE)
 	bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA)
 
-if SOURMASH_INPUT != 'false':
-	SOURMASH_FILE = SOURMASH_INPUT.split(',')[0]
-	SOURMASH_VERSION = SOURMASH_INPUT.split(',')[1]
-	DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
+if PROKKA_INPUT != 'false':
+	PROKKA_FILE = glob(PROKKA_INPUT.split(',')[0])[0]
+	PROKKA_VERSION_FILE = glob(PROKKA_INPUT.split(',')[1])[0]
+	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
 
-	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION, ANALYSING_DATE)
+	prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION_FILE, ANALYSING_DATE)
+	prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
+
+if SOURMASH_INPUT != 'false':
+	SOURMASH_FILE = glob(SOURMASH_INPUT.split(',')[0])[0]
+	SOURMASH_VERSION_FILE = glob(SOURMASH_INPUT.split(',')[1])[0]
+	DF_SOURMASH = pd.read_csv(SOURMASH_FILE, sep = '\t')
+
+	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE)
 	sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 
 status_parsing(OUTPUT_FILE_NAME)
