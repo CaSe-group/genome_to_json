@@ -10,7 +10,7 @@ process bakta_report {
         cp ${input} ${name}_report_bakta.input
         
         # get version-number from version-file
-        BAKTA_VERSION=\$(cat ${version}) 
+        BAKTA_VERSION=\$(cat ${version} | tr -d '\\n') 
         # add inputfile name and sample name to markdown template
         sed -e 's/#RESULTSENV#/${name}_report_bakta.input/g' ${markdown} | \
         sed -e 's/#NAMEENV#/${name}/g' | \

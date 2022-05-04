@@ -81,7 +81,7 @@ def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Abricate_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
-	RESULT_FILE.write(f"        \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
+	RESULT_FILE.write(f"        \"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\"\n")
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
@@ -104,7 +104,7 @@ def bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Bakta_Info\": {\n")
 	RESULT_FILE.write(f"        \"Analysing_Date\": {ANALYSING_DATE},\n")
-	RESULT_FILE.write(f"        \"Bakta_Version\": \"{BAKTA_VERSION}\",\n")
+	RESULT_FILE.write(f"        \"Bakta_Version\": \"{BAKTA_VERSION}\"\n")
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
 	return RESULT_FILE
