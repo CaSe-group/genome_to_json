@@ -76,13 +76,14 @@ include { split_fasta } from './modules/split_fasta.nf'
 * Workflows
 **************************/
 
-include { annotation_wf } from './workflows/annotation_wf.nf'
+include { abricate_wf } from './workflows/abricate_wf.nf'
 include { bakta_wf } from './workflows/bakta_wf'
+include { busco_wf } from './workflows/busco_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
-include { resistance_determination_wf } from './workflows/resistance_determination_wf.nf'
-include { taxonomic_classification_wf } from './workflows/taxonomic_classification_wf.nf'
-include { report_generation_full_wf } from './workflows/report.nf'
+include { prokka_wf } from './workflows/prokka_wf.nf'
+include { report_generation_full_wf } from './workflows/report_wf.nf'
+include { sourmash_wf } from './workflows/sourmash_wf.nf'
 
 
 /************************** 

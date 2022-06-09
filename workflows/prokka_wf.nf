@@ -1,6 +1,6 @@
 include { prokka } from './process/prokka.nf' 
 
-workflow annotation_wf {
+workflow prokka_wf {
     take: 
         fasta_input //tuple val(fasta_basename) path(fasta_file)
     main:

@@ -1,7 +1,6 @@
 include { bakta } from './process/bakta.nf'
 include { bakta_database } from './process/bakta_database.nf'
 
-
 workflow bakta_wf {
     take:   fasta_input
     main:   
@@ -25,7 +24,6 @@ workflow bakta_wf {
         to_json = bakta_json_ch 
         to_report = bakta_rep_ch
 }
-
 
 /*
 List available DB versions:

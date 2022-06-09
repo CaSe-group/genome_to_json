@@ -1,7 +1,7 @@
 include {download_db} from './process/download_db.nf'
 include {sourmash_classification; sourmash_signatures; sourmash_metagenome} from './process/sourmash'
 
-workflow taxonomic_classification_wf{
+workflow sourmash_wf{
 	take:
 		fasta_input //tuple val(fasta_basename) path(fasta_file)
 	main:

@@ -1,6 +1,6 @@
 include { abricate } from './process/abricate.nf'
 
-workflow resistance_determination_wf {
+workflow abricate_wf {
     take: 
         fasta_input //tuple val(fasta_basename) path(fasta_file)
     main:
