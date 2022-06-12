@@ -90,13 +90,6 @@ include { sourmash_wf } from './workflows/sourmash_wf.nf'
 
 
 /************************** 
-* Processes
-**************************/
-
-include { abricate } from './workflows/process/abricate.nf'
-//include { prokka } from './workflows/process/prokka.nf'
-
-/************************** 
 * MAIN WORKFLOW
 **************************/
 
@@ -139,7 +132,6 @@ workflow {
         prokka_wf.out.to_report,
         sourmash_wf.out.to_report
     )
-
 
 }
 
@@ -211,4 +203,3 @@ ________________________________________________________________________________
 ${c_green}genome_to_json${c_reset} | A Nextflow analysis workflow for fasta-genomes
     """
 }
-

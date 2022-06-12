@@ -44,28 +44,33 @@ workflow report_generation_full_wf {
         //     }
 
         //idea for simplified code:
-            def tool_list = []
+            def channel_input_dict = ['abricate' : abricate_report_ch,
+                                    'bakta' : bakta_report_ch,
+                                    'prokka' : prokka_report_ch,
+                                    'sourmash' : sourmash_report_ch
+                                    ]
+            def active_tool_list = []
             file(workflow.projectDir + "/nextflow.config").getText().eachLine { line ->
                 if (line.contains("_off")) {
                     tool_name = line.minus("_off = false").trim()
                     if ( !new GroovyShell(this.binding).evaluate("params.${tool_name}_off") ) {
-                        tool_list += tool_name
+                        active_tool_list += tool_name
                     }
                 }
             }
-            println tool_list
-            tool_list.eachWithIndex { tool, index ->
+            //println tool_list
+            active_tool_list.eachWithIndex { tool, index ->
                 tool_report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
-                tool_output_ch = Channel.empty().combine(evaluate("${tool}_report_ch"))
-                println tool_output_ch
-                // "${tool}_report_ch".view()
-                // new GroovyShell(this.binding).evaluate("${tool}_report(${tool}_report_ch.combine(tool_report))")
-            //         if ( index == 0 ) {
-            //             samplereportinput = ${tool}_report.out //if its the first tool of the list open a new channel containing the tool-report output
-            //         }
-            //         else {
-            //             samplereportinput = samplereportinput.mix(${tool}_report.out) //if its not the first list-element add the tool-report output to the created channel
-            //         }
+                tool_report_ch = channel_input_dict["${tool}"]
+                
+                //"${tool}_report"(tool_report_ch.combine(tool_report)) // step can be integrated in following if-statement
+                    if ( index == 0 ) {
+                        samplereportinput = "${tool}_report"(tool_report_ch.combine(tool_report))//if its the first tool of the list open a new channel containing the tool-report output
+                    }
+                    else {
+                        samplereportinput = samplereportinput.mix("${tool}_report"(tool_report_ch.combine(tool_report))) //if its not the first list-element add the tool-report output to the created channel
+                    }
+                    samplereportinput.view()
             }
          
 
@@ -80,12 +85,12 @@ workflow report_generation_full_wf {
             //     }
             // }
 
-        //     samplereportinput = samplereportinput.groupTuple(by: 0)
-        //                         .map{ it -> tuple (it[0],it[1],it[2].flatten()) }
-        //                         //.view()
-        //     sample_report(samplereportinput.combine(sampleheaderreport))
+            samplereportinput = samplereportinput.groupTuple(by: 0)
+                                .map{ it -> tuple (it[0],it[1],it[2].flatten()) }
+                                //.view()
+            sample_report(samplereportinput.combine(sampleheaderreport))
 
 
-        // // 3 sumarize sample reports in final report
-        //     summary(sample_report.out.flatten().collect(), report)
+        // 3 sumarize sample reports in final report
+            summary(sample_report.out.flatten().collect(), report)
 }
