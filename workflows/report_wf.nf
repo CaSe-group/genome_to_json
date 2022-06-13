@@ -30,12 +30,12 @@ workflow report_generation_full_wf {
             file(workflow.projectDir + "/nextflow.config").getText().eachLine { line ->
                 if (line.contains("_off")) {
                     tool_name = line.minus("_off = false").trim()
-                    if ( !new GroovyShell(this.binding).evaluate("params.${tool_name}_off") ) {
+                    if ( !evaluate("params.${tool_name}_off") ) {
                         active_tool_list += tool_name
                     }
                 }
             }
-
+            println active_tool_list
         // 2 Create tool-specific reports per sample
             active_tool_list.eachWithIndex { tool, index ->
                 tool_report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
