@@ -2,27 +2,21 @@ include { bakta } from './process/bakta.nf'
 include { bakta_database } from './process/bakta_database.nf'
 
 workflow bakta_wf {
-    take:   fasta_input
-    main:   
+    take:
+        fasta_input //tuple val(fasta-basename) path(fasta-file)
+    main:                          
+        if (!params.bakta_off) { 
             if (params.bakta_db) { database_bakta = file(params.bakta_db) }
-            else if ( !params.bakta_db ) { database_bakta = bakta_database() }
-                       
-            if (!params.bakta_off) { bakta(fasta_input,database_bakta) ; bakta_rep_ch = bakta.out.bakta_report_ch ; bakta_json_ch = bakta.out.bakta_json_ch }
-            else { bakta_output_ch = fasta_input
-                                    .map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
-                                    .combine(Channel.from('#no_data#')
-                                    .collectFile(name: 'bakta_dummy.txt', newLine: true)) //create & add dummy-file to the tuple
-                                    .combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
-                   bakta_report = fasta_input
-                                    .map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
-                                    .combine(Channel.from('#no_data#')
-                                    .collectFile(name: 'bakta_dummy.txt', newLine: true)) //create & add dummy-file to the tuple
-                                    .combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
+            else { database_bakta = bakta_database() }
+                
+            bakta(fasta_input,database_bakta) ; bakta_report_ch = bakta.out.bakta_report_ch ; bakta_json_ch = bakta.out.bakta_json_ch
         }
-
+        else { bakta_json_ch = Channel.empty()
+            bakta_report_ch = Channel.empty()
+        }
     emit:
-        to_json = bakta_json_ch 
-        to_report = bakta_rep_ch
+        to_json = bakta_json_ch //tuple val(fasta-basename), file(fasta-basename_bakta.tsv), path(bakta_version.txt)
+        to_report = bakta_report_ch //tuple val(fasta-basename), file(fasta-basename_bakta.gff3), path(bakta_version.txt), val("${params.output}/fasta-basename/2.bakta")
 }
 
 /*

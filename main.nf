@@ -44,8 +44,12 @@ if (params.profile) { exit 1, "--profile is WRONG use -profile" }
 if (!workflow.profile.contains('test_fasta') && !params.fasta) { exit 1, "Input missing, use [--fasta]" }
 
 // check that input params are used as such
-if (params.fasta == true) { exit 5, "Please provide a fasta file via [--fasta]" }
+if (params.fasta == true) { exit 2, "Please provide a fasta file via [--fasta]" }
 
+// check that at least one tool is active
+if (params.abricate_off && params.bakta_off && params.prokka_off && params.sourmash_off) {
+    exit 3, "All tools deactivated. Please activate at least on tool"
+}
 
 /************************** 
 * INPUTs
@@ -87,13 +91,6 @@ include { sourmash_wf } from './workflows/sourmash_wf.nf'
 
 
 /************************** 
-* Processes
-**************************/
-
-include { abricate } from './workflows/process/abricate.nf'
-//include { prokka } from './workflows/process/prokka.nf'
-
-/************************** 
 * MAIN WORKFLOW
 **************************/
 
@@ -106,35 +103,36 @@ workflow {
 
         if ( !params.split_fasta ) {
             fasta_ch = fasta_input_ch
-            .map { it -> tuple(it.baseName, it) }
+                        .map { it -> tuple(it.baseName, it) }
         }
         else {
             fasta_ch = split_fasta(fasta_input_ch)
-            .flatten()
-            .map { it -> tuple(it.baseName, it) }
+                        .flatten()
+                        .map { it -> tuple(it.baseName, it) }
         }
     }
 
-    // 2. Genome-analysis (Abricate, Bakta/Prokka, Sourmash)
-    //annotation_wf(fasta_ch)
-    bakta_wf(fasta_ch)
-    resistance_determination_wf(fasta_ch)
-    taxonomic_classification_wf(fasta_ch)
+    // 2. Genome-analysis (Abricate, Bakta, Prokka, Sourmash)
+    abricate_wf(fasta_ch) // Resistance-determination
+    bakta_wf(fasta_ch) // Annotation
+    prokka_wf(fasta_ch) // Annotation
+    sourmash_wf(fasta_ch) // Taxonomic-classification
 
     // 3. json-output
-    create_json_entries_wf( resistance_determination_wf.out.to_json, 
-                            bakta_wf.out.to_json, 
-                            taxonomic_classification_wf.out.to_json
+    create_json_entries_wf( 
+        abricate_wf.out.to_json,
+        bakta_wf.out.to_json,
+        prokka_wf.out.to_json,
+        sourmash_wf.out.to_json
     )
 
     // 4. report
-    if (!params.abricate_off && !params.bakta_off && !params.sourmash_off) {
-        report_generation_full_wf(  bakta_wf.out.to_report,
-                                    resistance_determination_wf.out.to_report,
-                                    taxonomic_classification_wf.out.to_report
-        )
-    }
-
+    report_generation_full_wf( 
+        abricate_wf.out.to_report,
+        bakta_wf.out.to_report,
+        prokka_wf.out.to_report,
+        sourmash_wf.out.to_report
+    )
 
 }
 
@@ -158,13 +156,13 @@ ${c_yellow}Input:${c_reset}
     
 ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
+    --bakta_off     turns off bakta-process
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
-    --bakta_off     turns off bakta-process
 
-    --split_fasta   splits multi-line fastas into single fasta-files
-    --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therefore json can be uploaded as new entry)
     --bakta_db      path to your own bakta DB instead (.tar.gz)
+    --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therefore json can be uploaded as new entry)
+    --split_fasta   splits multi-line fastas into single fasta-files
 
 ${c_yellow}Test profile:${c_reset}
     [-profile]-option "test_fasta" runs the test profile using a fasta-file,
@@ -186,7 +184,8 @@ def defaultMSG() {
     \u001B[1;30m______________________________________\033[0m
     Parameters:
         \033[2mAbricate switched off:  $params.abricate_off
-        Bakta switched off:    $params.bakta_off
+        Bakta switched off:     $params.bakta_off
+        Prokka switched off:    $params.prokka_off
         Sourmash switched off:  $params.sourmash_off
 
         Split fastas:           $params.split_fasta
@@ -205,4 +204,3 @@ ________________________________________________________________________________
 ${c_green}genome_to_json${c_reset} | A Nextflow analysis workflow for fasta-genomes
     """
 }
-

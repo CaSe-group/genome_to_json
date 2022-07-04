@@ -18,26 +18,26 @@ process sourmash_signatures {
 
 process sourmash_classification {
     label 'sourmash'
-    publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_taxonomy.tsv"
+    publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_sourmash_taxonomy.tsv"
     
     input:
         tuple val(name), path(signatures)
         path(sourmash_db)
     output: 
-        tuple val(name), path("${name}_taxonomy.tsv"), env(SOURMASH_VERSION)
+        tuple val(name), path("${name}_sourmash_taxonomy.csv"), path("sourmash_version.txt")
     script:
         """
         sourmash lca classify \
             --db ${sourmash_db} \
             --query ${signatures} \
-            > ${name}_taxonomy.tsv
+            > ${name}_sourmash_taxonomy.csv
 
-        SOURMASH_VERSION=\$(sourmash --version | cut -f 2 -d ' ') 
+        sourmash --version | cut -f 2 -d ' ' >> sourmash_version.txt
         """  
     stub:
         """
-        touch ${name}_taxonomy.tsv
-        SOURMASH_VERSION=stub
+        touch ${name}_sourmash_taxonomy.csv \
+            sourmash_version.txt
         """
 }
 
@@ -49,15 +49,14 @@ process sourmash_metagenome {
         tuple val(name), path(reads)
         path(sourmash_db)
     output:
-        tuple val(name), path("*_composition.csv")
+        tuple val(name), path("*_sourmash_composition.csv")
     script:
         """    
-        touch ${name}_composition.csv
-        sourmash sketch dna -p scaled=1000,k=31 ${reads} -o ${name}.sig || true
-        sourmash gather ${name}.sig ${sourmash_db} --ignore-abundance -o ${name}_composition.csv || true
+        sourmash sketch dna -p scaled=1000,k=31 ${reads} -o ${name}_sourmash.sig
+        sourmash gather ${name}_sourmash.sig ${sourmash_db} --ignore-abundance -o ${name}_sourmash_composition.csv
         """
     stub:
         """
-        touch ${name}_composition.csv
+        touch ${name}_sourmash_composition.csv
         """
 }
