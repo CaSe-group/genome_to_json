@@ -1,40 +1,60 @@
-include { bakta_report } from './process/report_bakta'
 include { abricate_report } from './process/report_abricate'
-include { sourmash_report } from './process/report_sourmash'
+include { bakta_report } from './process/report_bakta'
+include { prokka_report } from './process/report_prokka'
 include { sample_report } from './process/report_sample'
+include { sourmash_report } from './process/report_sourmash'
 include { summary } from './process/report'
 
 
 workflow report_generation_full_wf {
-    take: bakta_report_ch  // val(name), path(data_table)
-          abricate_report_ch // val(name), path(data_table), path(data_table2)
-          sourmash_report_ch // val(name), path(data_table)
+    take: 
+        abricate_report_ch // tuple val(fasta-basename) path(fasta-basename_abricate_ncbi.tsv)
+        bakta_report_ch  // tuple val(fasta-basename), file(fasta-basename_bakta.gff3), path(bakta_version.txt), val("${params.output}/fasta-basename/2.bakta")
+        busco_report_ch // tuple val(fasta-basename), 
+        prokka_report_ch // tuple val(fasta-basename), path(fasta-basename_prokka.gff
+        sourmash_report_ch // tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(fasta-basename_composition.csv)
     main:
         // 0 load reports
-            // toolreports
-            sourmashreport=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/sourmash.Rmd", checkIfExists: true)
-            abricatereport=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/abricate.Rmd", checkIfExists: true)
-            baktareport=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/bakta.Rmd", checkIfExists: true)
             // sample and summary report
-            sampleheaderreport=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/sampleheader.Rmd", checkIfExists: true)
-            report=Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/Report.Rmd", checkIfExists: true)
+            sampleheaderreport = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/sampleheader.Rmd", checkIfExists: true)
+            report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/Report.Rmd", checkIfExists: true)
 
-        // 1 create reports for each tool and samples its: reportprocess(inputchannel.combine(rmarkdowntemplate))
-            sourmash_report(sourmash_report_ch.combine(sourmashreport))
-            abricate_report(abricate_report_ch.combine(abricatereport))
-            bakta_report(bakta_report_ch.combine(baktareport))
-            
-        // 2 collect tool reports PER sample (add new via .mix(NAME_report.out))
-            samplereportinput =     sourmash_report.out
-                                    .mix(abricate_report.out)
-                                    .mix(bakta_report.out)
-                                    .groupTuple(by: 0)
-                                    .map{it -> tuple (it[0],it[1],it[2].flatten())}
+        // 1 Collect tool output-channels & scan which tools are active
 
+            def channel_input_dict = ['abricate' : abricate_report_ch,
+                                    'bakta' : bakta_report_ch,
+                                    'prokka' : prokka_report_ch,
+                                    'sourmash' : sourmash_report_ch
+                                    ]
+
+            def active_tool_list = []
+            file(workflow.projectDir + "/nextflow.config").getText().eachLine { line ->
+                if (line.contains("_off")) {
+                    tool_name = line.minus("_off = false").trim()
+                    if ( !evaluate("params.${tool_name}_off") ) {
+                        active_tool_list += tool_name
+                    }
+                }
+            }
+            println active_tool_list
+        // 2 Create tool-specific reports per sample
+            active_tool_list.eachWithIndex { tool, index ->
+                tool_report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
+                tool_report_ch = channel_input_dict["${tool}"]
+                if ( index == 0 ) {
+                    samplereportinput = "${tool}_report"(tool_report_ch.combine(tool_report))//if its the first tool of the list open a new channel containing the tool-report output
+                }
+                else {
+                    samplereportinput = samplereportinput.mix("${tool}_report"(tool_report_ch.combine(tool_report))) //if its not the first list-element add the tool-report output to the created channel
+                }
+            }
+
+            samplereportinput = samplereportinput.groupTuple(by: 0)
+                                .map{ it -> tuple (it[0],it[1],it[2].flatten()) }
+                                //.view()
             sample_report(samplereportinput.combine(sampleheaderreport))
 
 
-        // 3 sumarize sample reports
+        // 3 sumarize sample reports in final report
             summary(sample_report.out.flatten().collect(), report)
-
 }

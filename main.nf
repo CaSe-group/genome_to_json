@@ -47,7 +47,7 @@ if (!workflow.profile.contains('test_fasta') && !params.fasta) { exit 1, "Input 
 if (params.fasta == true) { exit 2, "Please provide a fasta file via [--fasta]" }
 
 // check that at least one tool is active
-if (params.abricate_off && params.bakta_off && params.prokka_off && params.sourmash_off) {
+if (params.abricate_off && params.bakta_off && params.prokka_off && params.sourmash_off && params.busco_off) {
     exit 3, "All tools deactivated. Please activate at least on tool"
 }
 
@@ -115,6 +115,7 @@ workflow {
     // 2. Genome-analysis (Abricate, Bakta, Prokka, Sourmash)
     abricate_wf(fasta_ch) // Resistance-determination
     bakta_wf(fasta_ch) // Annotation
+    busco_wf(fasta_ch) //
     prokka_wf(fasta_ch) // Annotation
     sourmash_wf(fasta_ch) // Taxonomic-classification
 
@@ -127,12 +128,13 @@ workflow {
     )
 
     // 4. report
-    report_generation_full_wf( 
-        abricate_wf.out.to_report,
-        bakta_wf.out.to_report,
-        prokka_wf.out.to_report,
-        sourmash_wf.out.to_report
-    )
+    // report_generation_full_wf( 
+    //     abricate_wf.out.to_report,
+    //     bakta_wf.out.to_report,
+    //     busco_wf.out.to_report,
+    //     prokka_wf.out.to_report,
+    //     sourmash_wf.out.to_report
+    // )
 
 }
 

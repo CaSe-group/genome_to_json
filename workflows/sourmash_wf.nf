@@ -10,14 +10,17 @@ workflow sourmash_wf{
 			sourmash_signatures(fasta_input)
 			sourmash_metagenome(fasta_input, download_db.out)
 			sourmash_output_ch = sourmash_classification(sourmash_signatures.out, download_db.out)
+			sourmash_report_ch = sourmash_classification.out.map{it -> tuple(it[0],it[1])}.join(sourmash_metagenome.out)
 		}
-        else { sourmash_output_ch = fasta_input
-                                    .map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
-                                    .combine(Channel.from('#no_data#')
-                                    .collectFile(name: 'sourmash_dummy.txt', newLine: true)) //create & add dummy-file to the tuple
-									.combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
+        else { 
+			sourmash_output_ch = Channel.empty()//fasta_input
+                                    //.map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
+                                    //.combine(Channel.from('#no_data#')
+                                    //.collectFile(name: 'sourmash_dummy.txt', newLine: true)) //create & add dummy-file to the tuple
+									//.combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
+			sourmash_report_ch = Channel.empty()
         }
 	emit:
-		to_json=sourmash_output_ch
-		to_report=sourmash_classification.out.map{it -> tuple(it[0],it[1])}.join(sourmash_metagenome.out)
+		to_json = sourmash_output_ch
+		to_report = sourmash_report_ch
 }
