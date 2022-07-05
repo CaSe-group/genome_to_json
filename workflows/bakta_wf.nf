@@ -9,9 +9,12 @@ workflow bakta_wf {
             if (params.bakta_db) { database_bakta = file(params.bakta_db) }
             else { database_bakta = bakta_database() }
                 
-            bakta(fasta_input,database_bakta) ; bakta_report_ch = bakta.out.bakta_report_ch ; bakta_json_ch = bakta.out.bakta_json_ch
+            bakta(fasta_input,database_bakta)
+            bakta_report_ch = bakta.out.bakta_report_ch
+            bakta_json_ch = bakta.out.bakta_json_ch
         }
-        else { bakta_json_ch = Channel.empty()
+        else {
+            bakta_json_ch = Channel.empty()
             bakta_report_ch = Channel.empty()
         }
     emit:

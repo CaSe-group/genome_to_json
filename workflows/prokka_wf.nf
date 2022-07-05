@@ -8,11 +8,8 @@ workflow prokka_wf {
             prokka_output_ch = prokka.out.prokka_tsv_ch
             prokka_report_ch = prokka.out.prokka_to_report
         }
-        else { prokka_output_ch = Channel.empty()//fasta_input
-                                    //.map{ it -> tuple(it[0]) } //take basename from fasta_input-tuple
-                                    //.combine(Channel.from('#no_data#')
-                                    //.collectFile(name: 'prokka_dummy.txt', newLine: true)) //create & add dummy-file to the tuple
-                                    //.combine(Channel.from('#no_data#')) //create & add dummy-val to the tuple
+        else { 
+            prokka_output_ch = Channel.empty()
             prokka_report_ch = Channel.empty()
         }
     emit:
