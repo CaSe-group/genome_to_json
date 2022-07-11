@@ -1,5 +1,5 @@
 include { bakta } from './process/bakta.nf'
-include { bakta_database } from './process/bakta_database.nf'
+include { bakta_database } from './process/bakta.nf'
 
 workflow bakta_wf {
     take:

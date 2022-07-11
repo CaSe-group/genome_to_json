@@ -1,7 +1,7 @@
 process sourmash_signatures {
     label 'sourmash'   
     // publishDir "${params.output}/sourmash_signatures", mode:'copy', pattern: "*.sig"
-    
+
     input:
         tuple val(name), path(reads)
     output:
@@ -19,7 +19,7 @@ process sourmash_signatures {
 process sourmash_classification {
     label 'sourmash'
     publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_sourmash_taxonomy.tsv"
-    
+
     input:
         tuple val(name), path(signatures)
         path(sourmash_db)
@@ -41,10 +41,26 @@ process sourmash_classification {
         """
 }
 
+process sourmash_db_download {
+    label 'ubuntu'
+    storeDir "${params.databases}/sourmash"
+
+    output:
+        path("*.json.gz")
+    script:
+        """
+        wget  --no-check-certificate -O gtdb-rs202.genomic.k31.lca.json.gz https://osf.io/9xdg2/download 
+        """
+    stub:
+        """
+        touch gtdb-rs202.genomic.k31.lca.json.gz
+        """
+}
+
 process sourmash_metagenome {
     label 'sourmash'
     publishDir "${params.output}/${name}/${params.sourmashdir}", mode: 'copy', pattern: "${name}_composition.csv"
-    
+
     input:
         tuple val(name), path(reads)
         path(sourmash_db)
