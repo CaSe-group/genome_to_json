@@ -22,7 +22,7 @@ process eggnog_emapper {
         tuple val(name), path(fasta)
         path(eggnog_db)
     output: 
-        tuple val(name), path("${name}_eggnog*"), env(EGGNOG_VERSION)
+        tuple val(name), path("${name}_eggnog*"), path("eggnog_version.txt")
     script:
         """
         emapper.py -i ${fasta} \
@@ -45,7 +45,7 @@ process eggnog_emapper {
             --target_orthologs all \
             -o ${name}_eggnog
         
-        EGGNOG_VERSION=\$(emapper.py --version) 
+        emapper.py --version >> eggnog_version.txt
         """  
     stub:
         """

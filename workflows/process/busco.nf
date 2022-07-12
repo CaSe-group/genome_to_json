@@ -5,7 +5,7 @@ process busco {
     input:
         tuple val(name), path(fasta)
     output: 
-        tuple val(name), path("${name}_busco_results"), env(BUSCO_VERSION)
+        tuple val(name), path("${name}_busco_results"), path("busco_version.txt")
     script:
         """
         busco --in ${fasta} \
@@ -13,7 +13,7 @@ process busco {
             --out ./${name}_busco_results \
             --mode genome
 
-        BUSCO_VERSION=\$(busco --version | cut -f 2 -d ' ') 
+        busco --version | cut -f 2 -d ' ' >> busco_version.txt
         """  
     stub:
         """
