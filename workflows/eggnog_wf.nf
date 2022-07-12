@@ -6,8 +6,8 @@ workflow eggnog_wf {
         fasta //tuple val(NAME), path({NAME}.fasta)
     main:   
         if (!params.eggnog_off) { 
-            eggnog_db_download
-            eggnog_emapper(fasta)
+            eggnog_db_download()
+            eggnog_emapper(fasta, eggnog_db_download.out)
         }
         else {
             eggnog_output_ch = Channel.empty()

@@ -2,15 +2,15 @@ process eggnog_db_download {
     label 'eggnog'
     storeDir "${params.databases}/eggnog"
     
-    // output: 
-    //     path(eggnog_db)
+    output: 
+        path("*")
     script:
         """
-        download_eggnog_data.py --data-dir ${params.databases}/eggnog/
+        download_eggnog_data.py -y --data_dir \$PWD
         """  
     stub:
         """
-        touch ${name}_eggnog.tsv
+        touch eggnog_db
         """
 }
 
@@ -20,13 +20,14 @@ process eggnog_emapper {
     
     input:
         tuple val(name), path(fasta)
+        path(eggnog_db)
     output: 
-        tuple val(name), path("${name}_eggnog_results"), env(EGGNOG_VERSION)
+        tuple val(name), path("${name}_eggnog_results*"), env(EGGNOG_VERSION)
     script:
         """
-        emapper.py --i ${fasta} \
+        emapper.py -i ${fasta} \
             -m diamond \
-            --data_dir ${params.databases}/eggnog/ \
+            --data_dir \$PWD \
             --itype genome \
             --genepred prodigal \
             --dmnd_ignore_warnings \
@@ -44,7 +45,7 @@ process eggnog_emapper {
             --target_orthologs all \
             -o ${name}_eggnog_results
         
-        EGGNOG_VERSION=\$(eggnog --version) 
+        EGGNOG_VERSION=\$(emapper.py --version) 
         """  
     stub:
         """

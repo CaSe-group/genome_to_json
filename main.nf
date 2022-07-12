@@ -47,7 +47,7 @@ if (!workflow.profile.contains('test_fasta') && !params.fasta) { exit 1, "Input 
 if (params.fasta == true) { exit 2, "Please provide a fasta file via [--fasta]" }
 
 // check that at least one tool is active
-if (params.abricate_off && params.bakta_off && params.prokka_off && params.sourmash_off && params.busco_off) {
+if (params.abricate_off && params.bakta_off && params.busco_off && params.eggnog_off && params.prokka_off && params.sourmash_off) {
     exit 3, "All tools deactivated. Please activate at least on tool"
 }
 
@@ -85,6 +85,7 @@ include { bakta_wf } from './workflows/bakta_wf'
 include { busco_wf } from './workflows/busco_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
+include { eggnog_wf } from './workflows/eggnog_wf.nf'
 include { prokka_wf } from './workflows/prokka_wf.nf'
 include { report_generation_full_wf } from './workflows/report_wf.nf'
 include { sourmash_wf } from './workflows/sourmash_wf.nf'
@@ -115,7 +116,8 @@ workflow {
     // 2. Genome-analysis (Abricate, Bakta, Prokka, Sourmash)
     abricate_wf(fasta_ch) // Resistance-determination
     bakta_wf(fasta_ch) // Annotation
-    busco_wf(fasta_ch) //
+    busco_wf(fasta_ch) // Housekeeping-gene screening to assume genome-completeness
+    eggnog_wf(fasta_ch) // Annotation
     prokka_wf(fasta_ch) // Annotation
     sourmash_wf(fasta_ch) // Taxonomic-classification
 
@@ -159,6 +161,8 @@ ${c_yellow}Input:${c_reset}
 ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
     --bakta_off     turns off bakta-process
+    --busco_off     turns off busco-process
+    --eggnog_off    turns off eggnog-process
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
 
@@ -187,6 +191,8 @@ def defaultMSG() {
     Parameters:
         \033[2mAbricate switched off:  $params.abricate_off
         Bakta switched off:     $params.bakta_off
+        Busco switched off:     $params.busco_off
+        Eggnog switched off:    $params.eggnog_off
         Prokka switched off:    $params.prokka_off
         Sourmash switched off:  $params.sourmash_off
 

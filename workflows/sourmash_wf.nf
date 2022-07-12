@@ -8,8 +8,8 @@ workflow sourmash_wf{
 		if (!params.sourmash_off) { 
 			sourmash_db_download()
 			sourmash_signatures(fasta_input)
-			sourmash_metagenome(fasta_input, download_db.out)
-			sourmash_output_ch = sourmash_classification(sourmash_signatures.out, download_db.out)
+			sourmash_metagenome(fasta_input, sourmash_db_download.out)
+			sourmash_output_ch = sourmash_classification(sourmash_signatures.out, sourmash_db_download.out)
 			sourmash_report_ch = sourmash_classification.out.map{it -> tuple(it[0],it[1])}.join(sourmash_metagenome.out)
 		}
         else { 
