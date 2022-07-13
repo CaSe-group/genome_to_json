@@ -18,6 +18,9 @@ process collect_fasta {
             *.gz)
                 zcat ${input_path} >> \$(echo "${input_path}" | sed "s/.gz//").fasta
                 ;;
+            *.xz)
+                unxz ${input_path}
+                ;;
             *)
                 for FILE in \$(find -L ${input_path} -name "*.fasta*"); do              #for loop over all ".fasta*"-files in the path
                     case \$FILE in
