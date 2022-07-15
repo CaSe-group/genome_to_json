@@ -37,17 +37,17 @@ if ( params.help ) { exit 0, helpMSG() }
 
 
 // profile helps
-if (params.profile) { exit 1, "--profile is WRONG use -profile" }
+if ( params.profile ) { exit 1, "--profile is WRONG use -profile" }
 
 
 // params help
-if (!workflow.profile.contains('test_fasta') && !params.fasta) { exit 1, "Input missing, use [--fasta]" }
+if ( !workflow.profile.contains('test_fasta') && !params.fasta ) { exit 1, "Input missing, use [--fasta]" }
 
 // check that input params are used as such
-if (params.fasta == true) { exit 2, "Please provide a fasta file via [--fasta]" }
+if ( params.fasta == true ) { exit 2, "Please provide a fasta file via [--fasta]" }
 
 // check that at least one tool is active
-if (params.abricate_off && params.bakta_off && params.busco_off && params.eggnog_off && params.prokka_off && params.sourmash_off) {
+if ( params.abricate_off && params.bakta_off && params.busco_off && params.eggnog_off && params.prokka_off && params.sourmash_off ) {
     exit 3, "All tools deactivated. Please activate at least on tool"
 }
 
@@ -66,6 +66,9 @@ if (params.abricate_off && params.bakta_off && params.busco_off && params.eggnog
 **************************/
 
 defaultMSG()
+if ( !params.busco_off) {
+    busco_db_info()
+}
 
 
 /************************** 
@@ -142,7 +145,7 @@ workflow {
 
 
 /*************  
-* --help
+* MSG
 *************/
 def helpMSG() {
     c_green = "\033[0;32m";
@@ -156,7 +159,9 @@ def helpMSG() {
     nextflow run CaSe-group/genome_to_json --fasta '/path/to/fasta'
 
 ${c_yellow}Input:${c_reset}
-    --fasta         direct input of genomes - supports multi-fasta file(s)
+    --fasta         direct input of genomes - supports multi-fasta file(s),
+                    .xz-packed fasta-files & input of a directory containing 
+                    fasta-files
     
 ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
@@ -167,7 +172,11 @@ ${c_yellow}Options:${c_reset}
     --sourmash_off  turns off sourmash-process
 
     --bakta_db      path to your own bakta DB instead (.tar.gz)
-    --new_entry     activates parsing of sample-name as sample-ID instead of hash-ID (therefore json can be uploaded as new entry)
+    --busco_db      choose a busco-database (full name) from
+                    "https://busco-data.ezlab.org/v5/data/lineages/"
+                    \033[2m[Default: "bacteria_odb10.2020-03-06.tar.gz"]\033[0m
+    --new_entry     activates parsing of sample-name as sample-ID instead of
+                    hash-ID (therefore json can be uploaded as new entry)
     --split_fasta   splits multi-line fastas into single fasta-files
 
 ${c_yellow}Test profile:${c_reset}
@@ -196,8 +205,10 @@ def defaultMSG() {
         Prokka switched off:    $params.prokka_off
         Sourmash switched off:  $params.sourmash_off
 
-        Split fastas:           $params.split_fasta
+        Busco-database:         $params.busco_db
         New entry:              $params.new_entry
+        Split fastas:           $params.split_fasta
+
     \u001B[1;30m______________________________________\033[0m
     """.stripIndent()
 
@@ -210,5 +221,13 @@ def header(){
 ________________________________________________________________________________
     
 ${c_green}genome_to_json${c_reset} | A Nextflow analysis workflow for fasta-genomes
+    """
+}
+
+def buscoDb_InfoMSG() {
+    log.info """
+    Busco-database:
+        \033[2mUsing Busco-db:  $params.busco_db
+    \u001B[1;30m______________________________________\033[0m
     """
 }

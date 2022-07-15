@@ -49,7 +49,7 @@ process sourmash_db_download {
         path("*.json.gz")
     script:
         """
-        wget  --no-check-certificate -O gtdb-rs202.genomic.k31.lca.json.gz https://osf.io/9xdg2/download 
+        wget --no-check-certificate -O gtdb-rs202.genomic.k31.lca.json.gz https://osf.io/9xdg2/download 
         """
     stub:
         """

@@ -3,10 +3,11 @@ process eggnog_db_download {
     storeDir "${params.databases}/eggnog"
     
     output: 
-        path("*")
+        path("eggnog_db")
     script:
         """
-        download_eggnog_data.py -y --data_dir \$PWD
+        mkdir eggnog_db
+        download_eggnog_data.py -y --data_dir eggnog_db/
         """  
     stub:
         """
@@ -20,14 +21,15 @@ process eggnog_emapper {
     
     input:
         tuple val(name), path(fasta)
-        path(eggnog_db)
+        path(eggnog_db_dir)
     output: 
         tuple val(name), path("${name}_eggnog*"), path("eggnog_version.txt")
     script:
         """
         emapper.py -i ${fasta} \
+            --cpu 14 \
             -m diamond \
-            --data_dir \$PWD \
+            --data_dir ${eggnog_db_dir} \
             --itype genome \
             --genepred prodigal \
             --dmnd_ignore_warnings \
