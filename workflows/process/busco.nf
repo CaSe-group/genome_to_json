@@ -37,10 +37,8 @@ process busco_db_download {
         """
         mkdir -p busco_downloads/lineages
         wget --no-check-certificate https://busco-data.ezlab.org/v5/data/file_versions.tsv -P busco_downloads/
-        wget --no-check-certificate "https://busco-data.ezlab.org/v5/data/lineages/${params.busco_db}" -P busco_downloads/lineages/
-        tar -xzf "busco_downloads/lineages/${params.busco_db}"
-        DATASET_BASENAME=\$(echo "${params.busco_db}" | cut -f 1 -d '.')
-        mv busco_downloads/lineages/${params.busco_db} busco_downloads/lineages/\${DATASET_BASENAME}
+        wget --no-check-certificate "https://busco-data.ezlab.org/v5/data/lineages/${params.busco_db}"
+        tar -xzf ${params.busco_db} -C busco_downloads/lineages/
         """  
     stub:
         """
