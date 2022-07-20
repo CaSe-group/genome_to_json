@@ -1,6 +1,8 @@
 process eggnog_db_download {
     label 'eggnog'
     storeDir "${params.databases}/eggnog"
+    errorStrategy 'retry'
+        maxRetries 5
     
     output: 
         path("eggnog_db")
