@@ -67,7 +67,7 @@ if ( params.abricate_off && params.bakta_off && params.busco_off && params.eggno
 
 defaultMSG()
 if ( !params.busco_off) {
-    busco_db_info()
+    buscoDb_InfoMSG()
 }
 
 
