@@ -32,13 +32,18 @@ process busco_db_download {
     storeDir "${params.databases}/busco"
     
     output:
-        path("busco_downloads")
+        tuple path("busco_downloads/file_versions.tsv"), path("busco_downloads/placement_files"), path("busco_downloads/lineages/${busco_db_basename}"), emit: busco_db_storage_ch
+        path("busco_downloads"), emit: busco_db_ch
     script:
+        busco_db_basename = params.busco_db.split("\\.")[0] //set new nextflow-variable to specify used database for output-pattern
         """
-        mkdir -p busco_downloads/lineages
+        mkdir -p busco_downloads/lineages busco_downloads/placement_files
         wget --no-check-certificate https://busco-data.ezlab.org/v5/data/file_versions.tsv -P busco_downloads/
         wget --no-check-certificate "https://busco-data.ezlab.org/v5/data/lineages/${params.busco_db}"
-        tar -xzf ${params.busco_db} -C busco_downloads/lineages/
+        wget --no-check-certificate --no-parent --recursive https://busco-data.ezlab.org/v5/data/placement_files/
+        for FILE in busco-data.ezlab.org/v5/data/placement_files/*.tar.gz; do tar -xzf \${FILE} -C busco_downloads/placement_files/; done
+        rm -rf ./busco-data.ezlab.org/
+        tar --no-same-owner -xzf ${params.busco_db} -C busco_downloads/lineages/
         """  
     stub:
         """

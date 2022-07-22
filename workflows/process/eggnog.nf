@@ -54,6 +54,6 @@ process eggnog_emapper {
     stub:
         """
         touch ${name}_eggnog
-        EGGNOG_VERSION=stub
+        echo "stub" >> eggnog_version.txt
         """
 }

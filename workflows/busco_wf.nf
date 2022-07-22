@@ -7,7 +7,7 @@ workflow busco_wf {
     main:   
         if (!params.busco_off) { 
             busco_db_download()
-            busco(fasta, busco_db_download.out)
+            busco(fasta, busco_db_download.out.busco_db_ch)
         }
         else {
             busco_output_ch = Channel.empty()
