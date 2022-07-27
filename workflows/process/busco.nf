@@ -15,15 +15,17 @@ process busco {
             --lineage_dataset \${DATASET_BASENAME} \
             --offline \
             --download_path ${busco_db_dir}/ \
-            --out ./${name}_busco_results \
+            --out ${name}_busco_results \
             --mode genome
+
+        generate_plot.py -wd ./${name}_busco_results
 
         busco --version | cut -f 2 -d ' ' >> busco_version.txt
         """  
     stub:
         """
         touch ${name}_busco.tsv
-        BUSCO_VERSION=stub
+        echo "stub" >> busco_version.txt
         """
 }
 
@@ -47,6 +49,8 @@ process busco_db_download {
         """  
     stub:
         """
-        touch busco_downloads
+        mkdir -p busco_downloads/lineages busco_downloads/placement_files
+        touch busco_downloads/file_versions.tsv
+        touch busco_downloads/lineages/bacteria_odb10
         """
 }
