@@ -133,15 +133,16 @@ workflow {
         sourmash_wf.out.to_json
     )
 
-    // 4. report
-    report_generation_full_wf( 
-        abricate_wf.out.to_report,
-        bakta_wf.out.to_report,
-        // busco_wf.out.to_report,
-        prokka_wf.out.to_report,
-        sourmash_wf.out.to_report
-    )
-
+    if ( !params.abricate_off || !params.bakta_off || !params.prokka_off || !params.sourmash_off ) {
+        // 4. report
+        report_generation_full_wf( 
+            abricate_wf.out.to_report,
+            bakta_wf.out.to_report,
+            // busco_wf.out.to_report,
+            prokka_wf.out.to_report,
+            sourmash_wf.out.to_report
+        )
+    }
 }
 
 
