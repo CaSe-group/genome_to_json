@@ -10,7 +10,7 @@ workflow report_generation_full_wf {
     take: 
         abricate_report_ch // tuple val(fasta-basename) path(fasta-basename_abricate_ncbi.tsv)
         bakta_report_ch  // tuple val(fasta-basename), file(fasta-basename_bakta.gff3), path(bakta_version.txt), val("${params.output}/fasta-basename/2.bakta")
-        busco_report_ch // tuple val(fasta-basename), 
+        // busco_report_ch // tuple val(fasta-basename), 
         prokka_report_ch // tuple val(fasta-basename), path(fasta-basename_prokka.gff
         sourmash_report_ch // tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(fasta-basename_composition.csv)
     main:
