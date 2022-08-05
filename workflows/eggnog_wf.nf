@@ -8,12 +8,14 @@ workflow eggnog_wf {
         if (!params.eggnog_off) { 
             eggnog_db_download()
             eggnog_emapper(fasta, eggnog_db_download.out)
+            eggnog_output_ch = Channel.empty()
+            eggnog_report_ch = Channel.empty()
         }
         else {
             eggnog_output_ch = Channel.empty()
-            eggnog_report = Channel.empty()
+            eggnog_report_ch = Channel.empty()
         }
-    //emit:
-        //to_json = busco_json_ch 
-        //to_report = busco_rep_ch
+    emit:
+        to_json = eggnog_output_ch 
+        to_report = eggnog_report_ch
 }
