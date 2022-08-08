@@ -24,7 +24,7 @@ process busco {
         """  
     stub:
         """
-        touch ${name}_busco.tsv
+        mkdir ${name}_busco_results
         echo "stub" >> busco_version.txt
         """
 }
