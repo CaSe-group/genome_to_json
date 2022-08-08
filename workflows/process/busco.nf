@@ -48,6 +48,7 @@ process busco_db_download {
         tar --no-same-owner -xzf ${params.busco_db} -C busco_downloads/lineages/
         """  
     stub:
+        busco_db_basename = params.busco_db.split("\\.")[0]
         """
         mkdir -p busco_downloads/lineages busco_downloads/placement_files
         touch busco_downloads/file_versions.tsv
