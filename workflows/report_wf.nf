@@ -43,7 +43,7 @@ workflow report_generation_full_wf {
         // 2 Create tool-specific reports per sample
             samplereportinput = Channel.empty()
 
-            active_tool_list.eachWithIndex { tool, index ->
+            active_tool_list.each { tool ->
                 tool_report_check = new File("${workflow.projectDir}" + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd")
                 if ( tool_report_check.exists() == true ) {
                     tool_report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
