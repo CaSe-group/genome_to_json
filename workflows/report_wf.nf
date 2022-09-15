@@ -47,6 +47,9 @@ workflow report_generation_full_wf {
                 tool_report_check = new File("${workflow.projectDir}" + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd")
                 if ( tool_report_check.exists() == true ) {
                     tool_report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
+                    //def tool_input_ch = evaluate("${tool}_report_ch".toString())
+                    //binding.setProperty('${tool}_test_ch', tool_input_ch)
+                    //"${tool}_test_ch".view()
                     tool_report_ch = channel_input_dict["${tool}"]
                     samplereportinput = samplereportinput.mix("${tool}_report"(tool_report_ch.combine(tool_report)))
                 }

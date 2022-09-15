@@ -8,13 +8,15 @@ process abricate {
         tuple val(name), path(dir)
         each abricate_db
     output:
-        tuple val(name), path("*abricate_ncbi.tsv"), path("abricate_ncbi_version.txt"), optional: true, emit: abricate_output_ch  //main output-channel if according file was created
+        tuple val(name), path("abricate_*_version.txt"), path("*abricate_ncbi.tsv"), optional: true, emit: abricate_ncbi_output_ch  //main output-channel if according file was created
+        tuple val(name), path("abricate_*_version.txt"), path("*abricate_resfinder.tsv"), optional: true, emit: abricate_resfinder_output_ch
+        tuple val(name), path("abricate_*_version.txt"), path("*abricate_plasmidfinder.tsv"), optional: true, emit: abricate_plasmidfinder_output_ch
         tuple val(name), val(abricate_db), path("*.tsv"), emit: abricate_files_ch //secondary output-channel to activate publishDir & feed res-parser
     script:
         """
         abricate ${dir} --nopath --quiet --mincov 80 --db ${abricate_db} >> "${name}"_abricate_"${abricate_db}".tsv
         
-        abricate --list | grep "ncbi" | cut -f 1,4 | tr "\t" "_" >> abricate_ncbi_version.txt
+        abricate --list | grep "${abricate_db}" | cut -f 1,4 | tr "\t" "_" >> abricate_${abricate_db}_version.txt
         """
     stub:
         """

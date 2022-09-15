@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser(description = 'Create json-file for upload to M
 parser.add_argument('-a', '--abricate', help = "Input Abricate-files", default = 'false')
 parser.add_argument('-b', '--bakta', help = "Input Bakta-files", default = 'false')
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
+parser.add_argument('-j', '--deep_json', help = "Generate deeper-leveled json-output with ABRicate & Sourmash", default = 'false')
 parser.add_argument('-n', '--new_entry', help = "Activates parsing of hash-ID as sample-ID", default = 'false' )
 parser.add_argument('-o', '--output', help = "Output-directory", default = os.getcwd())
 parser.add_argument('-p', '--prokka', help = "Input Prokka-files", default = 'false')
@@ -32,6 +33,7 @@ arg = parser.parse_args()
 #set arguments as variables:
 ABRICATE_INPUT = arg.abricate
 BAKTA_INPUT = arg.bakta
+DEEP_JSON = arg.deep_json
 HASHID_INPUT = arg.hashid
 NEW_ENTRY = arg.new_entry
 OUTPUT_DIR = arg.output
@@ -59,6 +61,12 @@ OUTPUT_FILE_NAME = str(HASHID_INPUT) + "_mongodb_report.json"
 def json_file_opening(OUTPUT_FILE_NAME):								#define function taking OUTPUT_FILE_NAME as input
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "w")							#open file with write access under variable RESULT_FILE
 	RESULT_FILE.write("{\n")											#write to RESULT_FILE
+	RESULT_FILE.close()													#close file
+	return RESULT_FILE													#end function by returning RESULT_FILE to global environment
+
+def json_file_opening_deep(OUTPUT_FILE_NAME):								#define function taking OUTPUT_FILE_NAME as input
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "w")							#open file with write access under variable RESULT_FILE
+	RESULT_FILE.write("[{\n")											#write to RESULT_FILE
 	RESULT_FILE.close()													#close file
 	return RESULT_FILE													#end function by returning RESULT_FILE to global environment
 
@@ -94,6 +102,24 @@ def abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("    \"Abricate_Result\": {\n")
 	[RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\",\n") if RES_GENE != RES_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{RES_GENE}\": \"true\"\n") for RES_GENE in RES_GENE_LIST]
+	#list comprehension over all RES_GENE´s in RES_GENE_LIST -> writes '"RES_GENE": "true",' to RESULT_FILE if not last list-element; else writes '"RES_GENE": "true"' (without comma)
+	RESULT_FILE.write("    },\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+def abricate_result_parsing_deep(OUTPUT_FILE_NAME, DF_ABRICATE):
+	RES_GENE_LIST = DF_ABRICATE['GENE'].values							#get list of all entries of 'GENE'-column in abricate-dataframe										#check if length of the list = 0	
+	SEQUENCE_LIST = DF_ABRICATE['SEQUENCE'].values
+	RESISTANCE_LIST = DF_ABRICATE['RESISTANCE'].values
+	COVERAGE_LIST = DF_ABRICATE['%COVERAGE'].values
+	IDENTITY_LIST = DF_ABRICATE['%IDENTITY'].values
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("    \"Abricate_Result\": {\n")
+	if len(RES_GENE_LIST) == 0:
+		RES_GENE_LIST = ['no_resistance_genes']							#if true set variable to single element list
+		[RESULT_FILE.write(f"        \"{RES_GENE_LIST[INDEX]}\": \"true\"") for INDEX in range(len(RES_GENE_LIST))]
+	else:
+		[RESULT_FILE.write(f"        \"{RES_GENE_LIST[INDEX]}\": {{'\n	\"Sequence\": \"{SEQUENCE_LIST[INDEX]}\",\n	\"Resistenz\": \"{RESISTANCE_LIST[INDEX]}\",\n	\"Coverage\": \"{COVERAGE_LIST[INDEX]}\",\n	\"Identity\": \"{IDENTITY_LIST[INDEX]}\"'}},") if RES_GENE != RES_GENE_LIST[-1] else RESULT_FILE.write(f"        \"{RES_GENE_LIST[INDEX]}\": {{'\n	\"Sequence\": \"{SEQUENCE_LIST[INDEX]}\",\n	\"Resistenz\": \"{RESISTANCE_LIST[INDEX]}\",\n	\"Coverage\": \"{COVERAGE_LIST[INDEX]}\",\n	\"Identity\": \"{IDENTITY_LIST[INDEX]}\"'}}") for INDEX in range(len(RES_GENE_LIST))]
 	#list comprehension over all RES_GENE´s in RES_GENE_LIST -> writes '"RES_GENE": "true",' to RESULT_FILE if not last list-element; else writes '"RES_GENE": "true"' (without comma)
 	RESULT_FILE.write("    },\n")
 	RESULT_FILE.close()
@@ -157,7 +183,6 @@ def sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DAT
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-
 def sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH):
 	STATUS = DF_SOURMASH['status'].values[0]
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
@@ -205,6 +230,12 @@ def json_file_closing(OUTPUT_FILE_NAME):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
+def json_file_closing_deep(OUTPUT_FILE_NAME):
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("}]")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
 
 ################################################################################
 ## Function calls
@@ -212,44 +243,66 @@ def json_file_closing(OUTPUT_FILE_NAME):
 DATE = os.popen('date -I | tr -d "-" |tr -d "\n"')					#create bash-output of parsed date
 ANALYSING_DATE = DATE.read()										#interpret bash-output in python
 
-json_file_opening(OUTPUT_FILE_NAME)										#trigger function 'json_file_opening' with according input
+if DEEP_JSON == 'false':
+	json_file_opening(OUTPUT_FILE_NAME)										#trigger function 'json_file_opening' with according input
 
-if NEW_ENTRY != 'false':
-	sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+	if NEW_ENTRY != 'false':
+		sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+	else:
+		hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
+
+	if ABRICATE_INPUT != 'false':
+		ABRICATE_FILE = glob(ABRICATE_INPUT.split(',')[0])[0]				#split abricate-input by ',' taking the first resulting element -> glob expands the wildcard "*", choosing the first result
+		ABRICATE_DB_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]	#split abricate-input by ',' taking the second resulting element -> glob expands the wildcard "*", choosing the first result
+		DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
+		
+		abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE)
+		abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
+
+	if BAKTA_INPUT != 'false':
+		BAKTA_FILE = glob(BAKTA_INPUT.split(',')[0])[0]
+		BAKTA_VERSION_FILE = glob(BAKTA_INPUT.split(',')[1])[0]
+		DF_BAKTA = pd.read_csv(BAKTA_FILE, skiprows=2, sep = '\t')
+		
+		bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE)
+		bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA)
+
+	if PROKKA_INPUT != 'false':
+		PROKKA_FILE = glob(PROKKA_INPUT.split(',')[0])[0]
+		PROKKA_VERSION_FILE = glob(PROKKA_INPUT.split(',')[1])[0]
+		DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
+
+		prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION_FILE, ANALYSING_DATE)
+		prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
+
+	if SOURMASH_INPUT != 'false':
+		SOURMASH_FILE = glob(SOURMASH_INPUT.split(',')[0])[0]
+		SOURMASH_VERSION_FILE = glob(SOURMASH_INPUT.split(',')[1])[0]
+		DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
+
+		sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE)
+		sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
+
+	status_parsing(OUTPUT_FILE_NAME)
+	json_file_closing(OUTPUT_FILE_NAME)
+
 else:
-	hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
-
-if ABRICATE_INPUT != 'false':
-	ABRICATE_FILE = glob(ABRICATE_INPUT.split(',')[0])[0]				#split abricate-input by ',' taking the first resulting element -> glob expands the wildcard "*", choosing the first result
-	ABRICATE_DB_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]	#split abricate-input by ',' taking the second resulting element -> glob expands the wildcard "*", choosing the first result
-	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
+	json_file_opening_deep(OUTPUT_FILE_NAME)
 	
-	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE)
-	abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
+	if ABRICATE_INPUT != 'false':
+		ABRICATE_FILE = glob(ABRICATE_INPUT.split(',')[0])[0]				#split abricate-input by ',' taking the first resulting element -> glob expands the wildcard "*", choosing the first result
+		ABRICATE_DB_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]	#split abricate-input by ',' taking the second resulting element -> glob expands the wildcard "*", choosing the first result
+		DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
+		
+		abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE)
+		abricate_result_parsing_deep(OUTPUT_FILE_NAME, DF_ABRICATE)
 
-if BAKTA_INPUT != 'false':
-	BAKTA_FILE = glob(BAKTA_INPUT.split(',')[0])[0]
-	BAKTA_VERSION_FILE = glob(BAKTA_INPUT.split(',')[1])[0]
-	DF_BAKTA = pd.read_csv(BAKTA_FILE, skiprows=2, sep = '\t')
-	
-	bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE)
-	bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA)
+	if SOURMASH_INPUT != 'false':
+		SOURMASH_FILE = glob(SOURMASH_INPUT.split(',')[0])[0]
+		SOURMASH_VERSION_FILE = glob(SOURMASH_INPUT.split(',')[1])[0]
+		DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
 
-if PROKKA_INPUT != 'false':
-	PROKKA_FILE = glob(PROKKA_INPUT.split(',')[0])[0]
-	PROKKA_VERSION_FILE = glob(PROKKA_INPUT.split(',')[1])[0]
-	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
+		sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE)
+		sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 
-	prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION_FILE, ANALYSING_DATE)
-	prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
-
-if SOURMASH_INPUT != 'false':
-	SOURMASH_FILE = glob(SOURMASH_INPUT.split(',')[0])[0]
-	SOURMASH_VERSION_FILE = glob(SOURMASH_INPUT.split(',')[1])[0]
-	DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
-
-	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE)
-	sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
-
-status_parsing(OUTPUT_FILE_NAME)
-json_file_closing(OUTPUT_FILE_NAME)
+	json_file_closing_deep(OUTPUT_FILE_NAME)

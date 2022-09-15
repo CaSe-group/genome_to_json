@@ -2,7 +2,7 @@ include { json_report } from './process/json_report'
 
 workflow create_json_entries_wf {
     take: 
-        abricate    //tuple val(fasta-basename) path(abricate_file) path(abricate_db_version.txt)
+        abricate    //tuple val(fasta-basename) path(abricate_db_version.txt) path(abricate_file) 
         bakta      //tuple val(fasta-basename) path(bakta_file) path(bakta_version.txt)
         prokka      //tuple val(fasta-basename) path(prokka_file) path(prokka_version.txt)
         sourmash    //tuple val(fasta-basename) path(sourmash_file) path(sourmash_version.txt)

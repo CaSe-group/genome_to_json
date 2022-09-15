@@ -39,7 +39,7 @@ process eggnog_emapper {
             --go_evidence non-electronic \
             --pfam_realign none \
             --report_orthologs \
-            --decorate_gff yes \
+            // --decorate_gff \
             --evalue 0.001 \
             --score 60 \
             --pident 40 \
