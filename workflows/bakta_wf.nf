@@ -1,6 +1,5 @@
 include { bakta } from './process/bakta.nf'
-include { bakta_database } from './process/bakta_database.nf'
-
+include { bakta_database } from './process/bakta.nf'
 
 workflow bakta_wf {
     take:
@@ -10,16 +9,18 @@ workflow bakta_wf {
             if (params.bakta_db) { database_bakta = file(params.bakta_db) }
             else { database_bakta = bakta_database() }
                 
-            bakta(fasta_input,database_bakta) ; bakta_report_ch = bakta.out.bakta_report_ch ; bakta_json_ch = bakta.out.bakta_json_ch
+            bakta(fasta_input,database_bakta)
+            bakta_report_ch = bakta.out.bakta_report_ch
+            bakta_json_ch = bakta.out.bakta_json_ch
         }
-        else { bakta_json_ch = Channel.empty()
+        else {
+            bakta_json_ch = Channel.empty()
             bakta_report_ch = Channel.empty()
         }
     emit:
         to_json = bakta_json_ch //tuple val(fasta-basename), file(fasta-basename_bakta.tsv), path(bakta_version.txt)
         to_report = bakta_report_ch //tuple val(fasta-basename), file(fasta-basename_bakta.gff3), path(bakta_version.txt), val("${params.output}/fasta-basename/2.bakta")
 }
-
 
 /*
 List available DB versions:

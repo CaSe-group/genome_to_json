@@ -10,18 +10,22 @@ workflow report_generation_full_wf {
     take: 
         abricate_report_ch // tuple val(fasta-basename) path(fasta-basename_abricate_ncbi.tsv)
         bakta_report_ch  // tuple val(fasta-basename), file(fasta-basename_bakta.gff3), path(bakta_version.txt), val("${params.output}/fasta-basename/2.bakta")
+        busco_report_ch // tuple val(fasta-basename), 
+        eggnog_report_ch // tuple val(fasta-basename), 
         prokka_report_ch // tuple val(fasta-basename), path(fasta-basename_prokka.gff
         sourmash_report_ch // tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(fasta-basename_composition.csv)
     main:
+        
         // 0 load reports
-            // sample and summary report
+        // sample and summary report
             sampleheaderreport = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/sampleheader.Rmd", checkIfExists: true)
             report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/Report.Rmd", checkIfExists: true)
 
         // 1 Collect tool output-channels & scan which tools are active
-
             def channel_input_dict = ['abricate' : abricate_report_ch,
                                     'bakta' : bakta_report_ch,
+                                    'busco' : busco_report_ch,
+                                    'eggnog' : eggnog_report_ch,
                                     'prokka' : prokka_report_ch,
                                     'sourmash' : sourmash_report_ch
                                     ]
@@ -30,21 +34,24 @@ workflow report_generation_full_wf {
             file(workflow.projectDir + "/nextflow.config").getText().eachLine { line ->
                 if (line.contains("_off")) {
                     tool_name = line.minus("_off = false").trim()
-                    if ( !evaluate("params.${tool_name}_off") ) {
+                    if ( ! evaluate("params.${tool_name}_off") ) {
                         active_tool_list += tool_name
                     }
                 }
             }
-            println active_tool_list
+
         // 2 Create tool-specific reports per sample
-            active_tool_list.eachWithIndex { tool, index ->
-                tool_report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
-                tool_report_ch = channel_input_dict["${tool}"]
-                if ( index == 0 ) {
-                    samplereportinput = "${tool}_report"(tool_report_ch.combine(tool_report))//if its the first tool of the list open a new channel containing the tool-report output
+            samplereportinput = Channel.empty()
+
+            active_tool_list.each { tool ->
+                tool_report_check = new File("${workflow.projectDir}" + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd")
+                if ( tool_report_check.exists() == true ) {
+                    tool_report = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
+                    tool_report_ch = channel_input_dict["${tool}"]
+                    samplereportinput = samplereportinput.mix("${tool}_report"(tool_report_ch.combine(tool_report)))
                 }
                 else {
-                    samplereportinput = samplereportinput.mix("${tool}_report"(tool_report_ch.combine(tool_report))) //if its not the first list-element add the tool-report output to the created channel
+                    return
                 }
             }
 
@@ -52,7 +59,6 @@ workflow report_generation_full_wf {
                                 .map{ it -> tuple (it[0],it[1],it[2].flatten()) }
                                 //.view()
             sample_report(samplereportinput.combine(sampleheaderreport))
-
 
         // 3 sumarize sample reports in final report
             summary(sample_report.out.flatten().collect(), report)

@@ -1,6 +1,7 @@
 process bakta {
-        publishDir "${params.output}/${name}/2.bakta", mode: 'copy'
-        label 'bakta' 
+    label 'bakta'
+    publishDir "${params.output}/${name}/2.bakta", mode: 'copy'
+
     input:
         tuple val(name), path(fasta) 
         file(database) 
@@ -33,3 +34,18 @@ process bakta {
         """
 }
 
+process bakta_database {
+    label 'ubuntu'
+    storeDir "${params.databases}/bakta"   
+
+    output:
+        path("db.tar.gz")
+    script:
+        """
+        wget --no-check-certificate https://zenodo.org/record/5215743/files/db.tar.gz
+        """
+    stub:
+        """
+        touch db.tar.gz
+        """
+    }
