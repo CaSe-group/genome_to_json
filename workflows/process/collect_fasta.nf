@@ -26,6 +26,9 @@ process collect_fasta {
                     case \$FILE in
                         *.gz)
                             zcat \$FILE >> \$PWD/\$(echo "\$FILE" | rev | cut -f 1 -d '/' | rev | sed "s/.gz//");   #zcat into file name without ".gz"-extension
+                            ;;
+                        *.xz)
+                            unxz \$FILE
                     esac
                 done
         esac
