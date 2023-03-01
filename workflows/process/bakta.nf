@@ -36,14 +36,14 @@ process bakta {
 
 process bakta_database {
     label 'ubuntu'
-    storeDir "${params.databases}/bakta-7025248"   
+    storeDir "${params.databases}/bakta-7669534"   
 
     output:
         path("db.tar.gz")
     script:
         """
         # when updating database update number in storeDir
-        wget --no-check-certificate https://zenodo.org/record/7025248/files/db.tar.gz
+        wget --no-check-certificate https://zenodo.org/record/7669534/files/db.tar.gz
         export BAKTA_DB=./db
         """
     stub:
