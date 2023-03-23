@@ -50,8 +50,10 @@ if ( params.busco_db == true ) { exit 3, "Please provide a complete busco-databa
 if ( params.abricate_off && params.bakta_off && params.busco_off && params.eggnog_off && params.prokka_off && params.sourmash_off ) {
     exit 3, "All tools deactivated. Please activate at least on tool"
 }
-
-
+// check if PGAP is run the species parameter was specified 
+if ( params.pgap_off == false && params.species == false ) {
+    exit 2, "Please provide a species in NCBI notation to run PGAP"
+}
 /************************** 
 * INPUTs
 **************************/
@@ -90,6 +92,7 @@ include { busco_wf } from './workflows/busco_wf'
 include { collect_fasta_wf } from './workflows/collect_fasta_wf.nf'
 include { create_json_entries_wf } from './workflows/create_json_entries_wf.nf'
 include { eggnog_wf } from './workflows/eggnog_wf.nf'
+include { pgap_wf } from './workflows/prokka_wf.nf'
 include { prokka_wf } from './workflows/prokka_wf.nf'
 include { report_generation_full_wf } from './workflows/report_wf.nf'
 include { sourmash_wf } from './workflows/sourmash_wf.nf'
@@ -123,6 +126,7 @@ workflow {
     busco_wf(fasta_ch) // Housekeeping-gene screening to assume genome-completeness
     eggnog_wf(fasta_ch) // Annotation
     prokka_wf(fasta_ch) // Annotation
+    pgap_wf(fasta_ch, params.species) // Annotation
     sourmash_wf(fasta_ch) // Taxonomic-classification
 
     // 3. json-output
@@ -163,10 +167,12 @@ ${c_yellow}Input:${c_reset}
     --fasta         direct input of genomes - supports multi-fasta file(s),
                     .xz-packed fasta-files & input of a directory containing 
                     fasta-files
+    --species       species in NCBI notation to run PGAP   
     
 ${c_yellow}Options:${c_reset}
     --abricate_off  turns off abricate-process
     --bakta_off     turns off bakta-process
+    --pgap_off      turns off pgap-process
     --busco_off     turns off busco-process
     --eggnog_off    turns off eggnog-process
     --prokka_off    turns off prokka-process
