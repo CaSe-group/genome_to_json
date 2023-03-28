@@ -18,13 +18,14 @@ process pgap_database {
 
 process pgap {
     label 'pgap'
+    publishDir "${params.output}/${name}/2.pgap", mode: 'copy'
     input: 
-        tuple val(name), path(fasta), val(species)
+        tuple val(name), path(fasta)
+        val(species)
         path(pgap_db)
 
     output: 
-        tuple val(name), path("${name}_pgap.faa"), path("${name}_pgap.gff",) path("annot_*"), emit: pgap_output_ch
-        publishDir "${params.output}/${name}/2.pgap", mode: 'copy'
+        tuple val(name),path("annot*"),path("VERSION") 
     script:
         """
         bash yaml_creator.sh ${fasta} "${species}"
@@ -33,15 +34,12 @@ process pgap {
         mkdir /pgap/pgap/input
         tar xzf ${pgap_db} --directory "/pgap/pgap/input" --strip-components=1
         rm ${pgap_db}
-        
         cwltool /pgap/pgap/pgap.cwl --fasta ${fasta} --ignore_all_errors --report_usage --submol meta.yaml
-        mv annot.faa ${name}_pgap.faa
-        mv annot.gff ${name}_pgap.gff
-
         """
     stub:
         """ 
-        touch ${name}_pgap.faa \
-              ${name}_pgap.gff
+        touch annot.faa \
+              annot.gff
         """
 }
+

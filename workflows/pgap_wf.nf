@@ -1,16 +1,25 @@
-include{ pgap } from './process/pgap.nf'
+include{ pgap} from './process/pgap.nf'
 include{ pgap_database } from './process/pgap.nf'
 
-workflow eggnog_wf {
+workflow pgap_wf {
     take:
         fasta //tuple val(NAME), path({NAME}.fasta)
         species
     main:  
-if (params.pgap_db) { pgap_db = file(params.pgap_db) }
-        else { pgap_db = pgap_database(params.pgap_v) }
+    if (!params.pgap_off) { 
+        if (params.pgap_db) { pgap_db = file(params.pgap_db) }
+            else { pgap_db = pgap_database(params.pgap_v) }
+        pgap(fasta, species, pgap_db)
+        pgap_output_ch = Channel.empty()
+        pgap_report_ch = Channel.empty()
+    }
+    else {
+        pgap_output_ch = Channel.empty()
+        pgap_report_ch = Channel.empty()
+    }   
 
-    pgap(combined_fasta_ch, species, pgap_db)
 
     emit:
-        pgap_output = pgap_output_ch 
+        to_json = pgap_output_ch 
+        to_report = pgap_report_ch
 }
