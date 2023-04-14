@@ -10,7 +10,10 @@ process json_report {
 	    tuple val(name), path("*.json")
     script:
     
-        if ( !params.abricate_off) { abricate_input = "*abricate_ncbi.tsv,*abricate_ncbi_version.txt" }
+        if ( !params.deep_json) { deep_json = "false" }
+        else { deep_json = "true" }
+
+        if ( !params.abricate_off) { abricate_input = "*abricate_combined_results.tsv,abricate_db_version.txt,abricate_command.txt" }
         else { abricate_input = "false" }
 
         if ( !params.bakta_off) { bakta_input = "*_bakta.tsv,*bakta_version.txt" }
@@ -26,6 +29,7 @@ process json_report {
         json_parser.py -i ${name} \
             -a ${abricate_input} \
             -b ${bakta_input} \
+            -j ${deep_json} \
             -n ${params.new_entry} \
             -p ${prokka_input} \
             -s ${sourmash_input}
