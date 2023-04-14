@@ -203,7 +203,8 @@ ${c_yellow}Tool options:${c_reset}
     --busco_db      choose a busco-database (full name) from
                     "https://busco-data.ezlab.org/v5/data/lineages/"
                     \033[2m[Default: "bacteria_odb10.2020-03-06.tar.gz"]\033[0m
-    --species       species in NCBI notation to run PGAP
+    --pgap_db       path to your own pgap DB instead
+    --species       species in NCBI notation; required to run PGAP
 
 ${c_yellow}Test profile:${c_reset}
     [-profile]-option "test_fasta" runs the test profile using a fasta-file,
