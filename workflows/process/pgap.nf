@@ -39,7 +39,8 @@ process pgap {
     stub:
         """ 
         touch annot.faa \
-              annot.gff
+              annot.gff \
+              VERSION
         """
 }
 
