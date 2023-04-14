@@ -12,6 +12,7 @@ workflow report_generation_full_wf {
         bakta_report_ch  // tuple val(fasta-basename), file(fasta-basename_bakta.gff3), path(bakta_version.txt), val("${params.output}/fasta-basename/2.bakta")
         busco_report_ch // tuple val(fasta-basename), 
         eggnog_report_ch // tuple val(fasta-basename), 
+        pgap_report_ch   
         prokka_report_ch // tuple val(fasta-basename), path(fasta-basename_prokka.gff
         sourmash_report_ch // tuple val(fasta-basename), path(fasta-basename_taxonomy.tsv), path(fasta-basename_composition.csv)
     main:
@@ -26,6 +27,7 @@ workflow report_generation_full_wf {
                                     'bakta' : bakta_report_ch,
                                     'busco' : busco_report_ch,
                                     'eggnog' : eggnog_report_ch,
+                                    'pgap'  : pgap_report_ch,
                                     'prokka' : prokka_report_ch,
                                     'sourmash' : sourmash_report_ch
                                     ]
