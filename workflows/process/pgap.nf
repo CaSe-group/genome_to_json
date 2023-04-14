@@ -11,9 +11,9 @@ process pgap_database {
         wget --no-check-certificate https://s3.amazonaws.com/pgap/input-${params.pgap_v}.tgz
         """
     stub:
-        
+        """ 
         touch input-${params.pgap_v}.tgz
-        
+        """ 
     }
 
 process pgap {
