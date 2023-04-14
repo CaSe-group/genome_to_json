@@ -155,16 +155,21 @@ def helpMSG() {
     c_blue = "\033[0;34m";
     c_dim = "\033[2m";
     log.info """
-    .    
+    
 \033[0;33mUsage examples:${c_reset}
     nextflow run CaSe-group/genome_to_json --fasta '/path/to/fasta'
 
 ${c_yellow}Input:${c_reset}
-    --fasta         direct input of genomes - supports multi-fasta file(s),
+    --fasta         direct input of genomes - also supports multi-fasta file(s),
                     .xz-packed fasta-files & input of a directory containing 
                     fasta-files
-    
-${c_yellow}Options:${c_reset}
+
+${c_yellow}General options:${c_reset}
+    --new_entry     activates parsing of sample-name as sample-ID instead of
+                    hash-ID (therefore json can be uploaded as new entry)
+    --split_fasta   splits multi-line fastas into single fasta-files
+
+${c_yellow}Tool switches:${c_reset}
     --abricate_off  turns off abricate-process
     --bakta_off     turns off bakta-process
     --busco_off     turns off busco-process
@@ -172,13 +177,16 @@ ${c_yellow}Options:${c_reset}
     --prokka_off    turns off prokka-process
     --sourmash_off  turns off sourmash-process
 
+${c_yellow}Tool options:${c_reset}
+    --abricate_coverage sets the coverage value [%] that ABRicate shall use
+                        \033[2m[Default: "80 %"]\033[0m
+    --abricate_identity sets the identity value [%] that ABRicate shall use
+                        \033[2m[Default: "80 %"]\033[0m
+    --abricate_update   forces an update for all databases used by ABRicate
     --bakta_db      path to your own bakta DB instead (.tar.gz)
     --busco_db      choose a busco-database (full name) from
                     "https://busco-data.ezlab.org/v5/data/lineages/"
                     \033[2m[Default: "bacteria_odb10.2020-03-06.tar.gz"]\033[0m
-    --new_entry     activates parsing of sample-name as sample-ID instead of
-                    hash-ID (therefore json can be uploaded as new entry)
-    --split_fasta   splits multi-line fastas into single fasta-files
 
 ${c_yellow}Test profile:${c_reset}
     [-profile]-option "test_fasta" runs the test profile using a fasta-file,
