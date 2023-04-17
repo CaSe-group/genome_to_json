@@ -9,17 +9,17 @@ workflow abricate_wf {
                 abricate_db = ['ncbi', 'card', 'vfdb', 'ecoh', 'argannot', 'plasmidfinder', 'resfinder'] //define ArrayList with ABRicate-databases to run
                 abricate(fasta_input, abricate_db)  //start process abricate with according variables
                 
-                abricate_output_ch = abricate_combiner(abricate.out.abricate_ncbi_output_ch)    //assign main-output of abricate-process to channel
-                abricate_report_ch = abricate_output_ch.map{ it -> tuple (it[0], it[3])} //extract ID & db-version file
+                abricate_combiner(abricate.out.abricate_ncbi_output_ch)    //assign main-output of abricate-process to channel
             }
             else {
                 abricate_db = ['plasmidfinder', 'resfinder']
                 abricate(fasta_input, abricate_db)  //start process abricate with according variables
                 
                 abricate_output_ch_raw = abricate.out.abricate_deep_json_output_ch.groupTuple()      //assign main-output of abricate-process to channel
-                abricate_output_ch = abricate_combiner(abricate_output_ch_raw)
-                abricate_report_ch = abricate_output_ch.map{ it -> tuple (it[0], it[3])}
+                abricate_combiner(abricate_output_ch_raw)
             }
+            abricate_output_ch = abricate_combiner.out.abricate_combiner_file_output_ch
+            abricate_report_ch = abricate_combiner.out.abricate_combiner_report_output_ch
             //abricate_output_ch.view()
             //abricate_report_ch.view()
         }

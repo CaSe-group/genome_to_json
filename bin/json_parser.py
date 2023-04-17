@@ -85,11 +85,13 @@ def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	return RESULT_FILE
 
 def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE):
+	ABRICATE_VERSION = open(f"{ABRICATE_VERSION_FILE}", "r").read().strip()
 	ABRICATE_DB_VERSION = open(f"{ABRICATE_DB_VERSION_FILE}", "r").read().strip().replace('\n','; ')
 	ABRICATE_COMMAND = open(f"{ABRICATE_COMMAND_FILE}", "r").read().strip()
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("\t\"Abricate_Info\": {\n")
 	RESULT_FILE.write(f"\t\t\"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"\t\t\"Abricate_Version\": \"{ABRICATE_VERSION}\",\n")
 	RESULT_FILE.write(f"\t\t\"Abricate_Db_Version\": \"{ABRICATE_DB_VERSION}\",\n")
 	RESULT_FILE.write(f"\t\t\"Abricate_Command\": \"{ABRICATE_COMMAND}\"\n")
 	RESULT_FILE.write("\t},\n")
@@ -256,10 +258,11 @@ else:
 	hashid_parsing(OUTPUT_FILE_NAME, HASHID_INPUT)
 
 if ABRICATE_INPUT != 'false':
-	ABRICATE_FILE = glob(ABRICATE_INPUT.split(',')[0])[0]				#split abricate-input by ',' taking the first resulting element -> glob expands the wildcard "*", choosing the first result
-	ABRICATE_DB_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]	#split abricate-input by ',' taking the second resulting element
-	ABRICATE_COMMAND_FILE = glob(ABRICATE_INPUT.split(',')[2])[0]		#split abricate-input by ',' taking the third resulting element
-	DF_ABRICATE = pd.read_csv(ABRICATE_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
+	ABRICATE_RESULT_FILE = glob(ABRICATE_INPUT.split(',')[0])[0]		#split abricate-input by ',' taking the first resulting element -> glob expands the wildcard "*", choosing the first result
+	ABRICATE_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]		#split abricate-input by ',' taking the second resulting element
+	ABRICATE_DB_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[2])[0]	#split abricate-input by ',' taking the third resulting element
+	ABRICATE_COMMAND_FILE = glob(ABRICATE_INPUT.split(',')[3])[0]		#split abricate-input by ',' taking the fourth resulting element
+	DF_ABRICATE = pd.read_csv(ABRICATE_RESULT_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 
 	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE)
 	
