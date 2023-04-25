@@ -14,4 +14,5 @@
 also for mutlifasta-input & different packing-formats [.gz; .xz].
 
 ## ToDos
+* [ ] taxonomic determination [GTDB]
 * [ ] plasmid [yes/no]
