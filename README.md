@@ -7,8 +7,9 @@
 ## Features
 * taxonomic determination [sourmash]
 * contamination check [sourmash]
+* completeness check [busco]
 * resistance determination [ABRicate]
-* gene annotation [bakta; pgap; prokka]
+* gene annotation [bakta; eggnog; pgap; prokka]
 
 also for mutlifasta-input & different packing-formats [.gz; .xz].
 
