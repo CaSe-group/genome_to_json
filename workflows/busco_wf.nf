@@ -5,7 +5,7 @@ workflow busco_wf {
     take:
         fasta //tuple val(NAME), path({NAME}.fasta)
     main:   
-        if (!params.busco_off) { 
+        if ( params.busco ) { 
             busco_db_download()
             busco(fasta, busco_db_download.out.busco_db_ch)
             busco_output_ch = Channel.empty()

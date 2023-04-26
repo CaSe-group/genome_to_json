@@ -32,25 +32,23 @@ workflow report_generation_full_wf {
                                     'sourmash' : sourmash_report_ch
                                     ]
 
+            def tool_list = channel_input_dict.keySet() as ArrayList
             def active_tool_list = []
-            file(workflow.projectDir + "/nextflow.config").getText().eachLine { line ->
-                if (line.contains("_off")) {
-                    tool_name = line.minus("_off = false").trim()
-                    if ( ! evaluate("params.${tool_name}_off") ) {
-                        active_tool_list += tool_name
-                    }
+            tool_list.each { tool ->
+                if ( evaluate("params.${tool}") ) {
+                    active_tool_list += tool
                 }
             }
 
         // 2 Create tool-specific reports per sample
             samplereportinput = Channel.empty()
 
-            active_tool_list.each { tool ->
-                tool_report_check = new File("${workflow.projectDir}" + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd")
+            active_tool_list.each { active_tool ->
+                tool_report_check = new File("${workflow.projectDir}" + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${active_tool}.Rmd")
                 if ( tool_report_check.exists() == true ) {
-                    tool_report_template_ch = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${tool}.Rmd", checkIfExists: true)
-                    tool_result_ch = channel_input_dict["${tool}"]
-                    samplereportinput = samplereportinput.mix("${tool}_report"(tool_result_ch.combine(tool_report_template_ch)))
+                    tool_report_template_ch = Channel.fromPath(workflow.projectDir + "/submodule/rmarkdown_reports/rmarkdown_reports/templates/${active_tool}.Rmd", checkIfExists: true)
+                    tool_result_ch = channel_input_dict["${active_tool}"]
+                    samplereportinput = samplereportinput.mix("${active_tool}_report"(tool_result_ch.combine(tool_report_template_ch)))
                 }
                 else {
                     return

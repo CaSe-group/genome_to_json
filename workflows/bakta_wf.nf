@@ -5,7 +5,7 @@ workflow bakta_wf {
     take:
         fasta_input //tuple val(fasta-basename) path(fasta-file)
     main:                          
-        if (!params.bakta_off) { 
+        if ( params.bakta ) { 
             if (params.bakta_db) { database_bakta = file(params.bakta_db) }
             else { database_bakta = bakta_database() }
                 

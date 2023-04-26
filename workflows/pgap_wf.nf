@@ -6,7 +6,7 @@ workflow pgap_wf {
         fasta //tuple val(NAME), path({NAME}.fasta)
         species
     main:  
-    if (!params.pgap_off) { 
+    if ( params.pgap ) { 
         if (params.pgap_db) { pgap_db = file(params.pgap_db) }
             else { pgap_db = pgap_database(params.pgap_v) }
         pgap(fasta, species, pgap_db)

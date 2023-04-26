@@ -13,16 +13,16 @@ process json_report {
         if ( !params.deep_json) { deep_json = "false" }
         else { deep_json = "true" }
 
-        if ( !params.abricate_off) { abricate_input = "*abricate_combined_results.tsv,abricate_version.txt,abricate_db_version.txt,abricate_command.txt" }
+        if ( params.abricate) { abricate_input = "*abricate_combined_results.tsv,abricate_version.txt,abricate_db_version.txt,abricate_command.txt" }
         else { abricate_input = "false" }
 
-        if ( !params.bakta_off) { bakta_input = "*_bakta.tsv,*bakta_version.txt" }
+        if ( params.bakta) { bakta_input = "*_bakta.tsv,*bakta_version.txt" }
         else { bakta_input = "false" }
 
-        if ( !params.prokka_off) { prokka_input = "*_prokka.tsv,*prokka_version.txt"}
+        if ( params.prokka) { prokka_input = "*_prokka.tsv,*prokka_version.txt"}
         else { prokka_input = "false" }
 
-        if ( !params.sourmash_off) { sourmash_input = "*_sourmash_taxonomy.csv,*sourmash_version.txt" }
+        if ( params.sourmash) { sourmash_input = "*_sourmash_taxonomy.csv,*sourmash_version.txt" }
         else { sourmash_input = "false" }
      
         """

@@ -36,31 +36,31 @@ exit 1
 if ( params.help ) { exit 0, helpMSG() }
 
 // profile helps
-if ( params.profile ) { exit 1, "--profile is WRONG use -profile" }
+if ( params.profile ) { exit 1, "[--profile] is WRONG use [-profile]." }
 
 // params help
-if ( !workflow.profile.contains('test_fasta') && !params.fasta ) { exit 1, "Input missing, use [--fasta]" }
+if ( !workflow.profile.contains('test_fasta') && !params.fasta ) { exit 1, "Input missing, use [--fasta]." }
 
 // check that input params are used as such
-if ( params.fasta == true ) { exit 2, "Please provide a fasta file via [--fasta]" }
+if ( params.fasta == true ) { exit 2, "Please provide a fasta file via [--fasta]." }
 
-if ( params.busco_db == true ) { exit 3, "Please provide a complete busco-database name (with \"tar.gz\"-ending) via [--busco_db]" }
+if ( params.busco_db == true ) { exit 3, "Please provide a complete busco-database name (with \"tar.gz\"-ending) via [--busco_db]." }
 
 // check that at least one tool is active
-if ( params.abricate_off && params.bakta_off && params.busco_off && params.eggnog_off && params.prokka_off  && params.abricate_off && params.sourmash_off ) {
-    exit 3, "All tools deactivated. Please activate at least on tool"
+if ( !params.abricate && !params.bakta && !params.busco && !params.eggnog && !params.pgap && !params.prokka && !params.sourmash ) {
+    exit 3, "All tools deactivated. Please activate at least one tool."
 }
 // check if PGAP is run the species parameter was specified 
-if ( params.pgap_off == false && !params.species ) { exit 1, "Please provide the species in a NCBI notation to run PGAP" }
+if ( params.pgap && !params.species ) { exit 1, "Please provide the species in a NCBI notation to run PGAP." }
 
 // Use pgap profile for working with pgap
- if ( params.pgap_off == false && workflow.profile.contains ("ukj_cloud")) {
-    exit 1, "Please use pgap_cloud profile [-profile pgap_cloud]"
+ if ( params.pgap && workflow.profile.contains ("ukj_cloud")) {
+    exit 1, "Please use pgap_cloud profile [-profile pgap_cloud]."
  }
 
 // Use ukj_cloud profile if you are not working with pgap
- if ( params.pgap_off == true && workflow.profile.contains ("pgap_cloud")) {
-    exit 1, "Please use ukj_cloud profile [-profile ukj_cloud]"
+ if ( !params.pgap && workflow.profile.contains ("pgap_cloud")) {
+    exit 1, "Please use ukj_cloud profile [-profile ukj_cloud]."
  }
 /************************** 
 * INPUTs
@@ -77,7 +77,7 @@ if ( params.pgap_off == false && !params.species ) { exit 1, "Please provide the
 **************************/
 
 defaultMSG()
-if ( !params.busco_off) {
+if ( params.busco) {
     buscoDb_InfoMSG()
 }
 
@@ -170,7 +170,7 @@ def helpMSG() {
     log.info """
     
 \033[0;33mUsage examples:${c_reset}
-    nextflow run CaSe-group/genome_to_json --fasta '/path/to/fasta'
+    nextflow run CaSe-group/genome_to_json --fasta '/path/to/fasta' --abricate
 
 ${c_yellow}Input:${c_reset}
     --fasta         direct input of genomes - also supports multi-fasta file(s),
@@ -183,15 +183,14 @@ ${c_yellow}General options:${c_reset}
     --split_fasta   splits multi-line fastas into single fasta-files
 
 ${c_yellow}Tool switches:${c_reset}
-    --abricate_off  turns off abricate-process
-    --bakta_off     turns off bakta-process
-    --pgap_off      turns off pgap-process
-    --busco_off     turns off busco-process
-    --eggnog_off    turns off eggnog-process
-    --prokka_off    turns off prokka-process
-    --sourmash_off  turns off sourmash-process
-    --pgap_off      turns off pgap-process
-
+    --abricate  turns on abricate-process
+    --bakta     turns on bakta-process
+    --pgap      turns on pgap-process
+    --busco     turns on busco-process
+    --eggnog    turns on eggnog-process
+    --prokka    turns on prokka-process
+    --sourmash  turns on sourmash-process
+    --pgap      turns on pgap-process
 
 ${c_yellow}Tool options:${c_reset}
     --abricate_coverage sets the coverage value [%] that ABRicate shall use
@@ -221,21 +220,21 @@ def defaultMSG() {
     Pathing:
     \033[2mWorkdir location [-work-Dir]:
         $workflow.workDir
+    
     Output dir [--output]: 
         $params.output
     \u001B[1;30m______________________________________\033[0m
     Parameters:
-        \033[2mAbricate switched off:  $params.abricate_off
-        Bakta switched off:     $params.bakta_off
-        Busco switched off:     $params.busco_off
-        Eggnog switched off:    $params.eggnog_off
-        Prokka switched off:    $params.prokka_off
-        Sourmash switched off:  $params.sourmash_off
-        PGAP switched off:      $params.pgap_off
+        \033[2mAbricate switched on:    $params.abricate
+        Bakta switched on:      $params.bakta
+        Busco switched on:      $params.busco
+        Eggnog switched on:     $params.eggnog
+        PGAP switched on:       $params.pgap
+        Prokka switched on:     $params.prokka
+        Sourmash switched on:   $params.sourmash
 
         New entry:              $params.new_entry
         Split fastas:           $params.split_fasta
-
     \u001B[1;30m______________________________________\033[0m
     """.stripIndent()
 
@@ -247,7 +246,7 @@ def header(){
     log.info """
 ________________________________________________________________________________
     
-${c_green}genome_to_json${c_reset} | A Nextflow analysis workflow for fasta-genomes
+${c_green}genome_to_json${c_reset} | A Nextflow analysis workflow for bacteria genome-analysis from fastas
     """
 }
 

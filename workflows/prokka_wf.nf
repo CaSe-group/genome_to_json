@@ -4,7 +4,7 @@ workflow prokka_wf {
     take: 
         fasta_input //tuple val(fasta_basename) path(fasta_file)
     main:
-        if (!params.prokka_off) {
+        if ( params.prokka ) {
             prokka(fasta_input)
             prokka_output_ch = prokka.out.prokka_tsv_ch
             prokka_report_ch = prokka.out.prokka_report_ch

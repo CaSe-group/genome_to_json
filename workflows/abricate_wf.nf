@@ -4,7 +4,7 @@ workflow abricate_wf {
     take: 
         fasta_input //tuple val(fasta_basename) path(fasta_file)
     main:
-        if (!params.abricate_off) {
+        if ( params.abricate ) {
             if (!params.deep_json) {
                 abricate_db = ['ncbi', 'card', 'vfdb', 'ecoh', 'argannot', 'plasmidfinder', 'resfinder'] //define ArrayList with ABRicate-databases to run
                 abricate(fasta_input, abricate_db)  //start process abricate with according variables

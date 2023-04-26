@@ -5,7 +5,7 @@ workflow sourmash_wf{
 	take:
 		fasta_input //tuple val(fasta_basename) path(fasta_file)
 	main:
-		if (!params.sourmash_off) { 
+		if ( params.sourmash ) { 
 			sourmash_db_download()
 			sourmash_signatures(fasta_input)
 			sourmash_metagenome(fasta_input, sourmash_db_download.out)
