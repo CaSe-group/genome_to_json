@@ -6,8 +6,8 @@ process busco {
         tuple val(name), path(fasta)
         path(busco_db_dir)
     output: 
-        tuple val(name), path("${name}_full_table.tsv"), path("busco_version.txt"), path("busco_db_version.txt"), path("busco_command.txt"), emit: busco_file_output_ch
-        tuple val(name), path("${name}_full_table.tsv"), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), emit: busco_report_output_ch
+        tuple val(name), path("busco_version.txt"), path("busco_db_version.txt"), path("busco_command.txt"), path("${name}_full_table.tsv"), emit: busco_file_output_ch
+        tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), path("${name}_full_table.tsv"), emit: busco_report_output_ch
         tuple val(name), path("${name}_busco_results"), emit: busco_files_ch //secondary output-channel to activate publishDir
     script:
         """

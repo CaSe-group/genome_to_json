@@ -1,4 +1,4 @@
-process abricate_report {
+process busco_report {
         label 'ubuntu'  
     input:
         tuple val(name), val(busco_version), val(busco_db_version), val(command), path(result_file), path(markdown)
@@ -15,7 +15,7 @@ process abricate_report {
         sed -e 's/#TOOLVERSIONENV#/${busco_version}/g' | \
         sed -e 's/#DBVERSIONENV#/${busco_db_version}/g' | \
         sed -e 's/#COMMANDENV#/${command}/g' | \
-        sed -e 's/#PATHENV#/${params.output}/g' > ${name}_report_busco.Rmd
+        sed -e 's|#PATHENV#|${params.output}|g' > ${name}_report_busco.Rmd
         """
     stub:
         """
