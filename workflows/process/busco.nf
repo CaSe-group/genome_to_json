@@ -22,7 +22,7 @@ process busco {
 
         generate_plot.py -wd ./${name}_busco_results
         
-        tail -n +3 ${name}_busco_results/run_\${DATASET_BASENAME}/full_table.tsv > ./${name}_full_table.tsv
+        tail -n +3 ${name}_busco_results/run_\${DATASET_BASENAME}/full_table.tsv | sed "s/# Busco id/Busco_id/" > ./${name}_full_table.tsv
 
         BUSCO_VERSION=\$(busco --version | cut -f 2 -d ' ')
         echo \${BUSCO_VERSION} > busco_version.txt
