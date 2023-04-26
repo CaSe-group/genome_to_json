@@ -38,6 +38,7 @@ process abricate {
         printf "S.126.21.Cf.fasta	S.126.21.Cf_contig35	15020	15820	-	blaVIM-1	1-801/801	===============	0/0	100.00	100.00	ncbi	NG_050336.1	subclass B1 metallo-beta-lactamase VIM-1	CARBAPENEM\\n" >> "${name}"_abricate_"${abricate_db}".tsv
         printf "S.126.21.Cf.fasta	S.126.21.Cf_contig35	14358	14912	-	aac(6')-Ib-G	1-555/555	===============	0/0	100.00	99.82	ncbi	NG_052361.1	AAC(6')-Ib family aminoglycoside 6'-N-acetyltransferase	GENTAMICIN\\n" >> "${name}"_abricate_"${abricate_db}".tsv
         
+        touch abricate_version_with_${abricate_db}.txt
         touch abricate_${abricate_db}_command.txt
         touch abricate_${abricate_db}_version.txt
         """
@@ -62,7 +63,6 @@ process abricate_combiner {
         ABRICATE_VERSION=\$(cat abricate_version_with_*.txt | uniq)
         echo \${ABRICATE_VERSION} >> abricate_version.txt
 
-
         DB_VERSION=\$(cat abricate_*_version.txt | sed -z "s/\\n/; /g" | sed "s/; \\\$//g")
         echo \${DB_VERSION} >> abricate_db_version.txt
 
@@ -73,6 +73,8 @@ process abricate_combiner {
         """
         printf "#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%%COVERAGE	%%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE\\n" >> "${name}"_abricate_combined_results.tsv
 
-        touch abricate_ncbi_version.txt
+        touch abricate_version.txt
+        touch abricate_db_version.txt
+        touch abricate_command.txt
         """
 }
