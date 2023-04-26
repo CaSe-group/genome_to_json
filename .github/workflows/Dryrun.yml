@@ -14,16 +14,20 @@ jobs:
     - name: fasta dry run
       run: |
           touch genome.fasta 
-          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub
+          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --abricate --bakta --busco --eggnog --pgap --prokka --sourmash
+    - name: fasta dry run - deep-json test
+      run: |
+          touch genome.fasta 
+          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --abricate --deep_json
     - name: fasta dry run - tool deactivation 1
       run: |
           touch genome.fasta 
-          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --new_entry --sourmash_off
+          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --new_entry --abricate --bakta --busco --eggnog --pgap --prokka
     - name: fasta dry run - tool deactivation 2
       run: |
           touch genome.fasta 
-          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --output new_result_dir --prokka_off
+          ./nextflow run main.nf --fasta genome.fasta -stub -profile stub --output new_result_dir --abricate --bakta --busco
     - name: fasta dir test
       run: |
           mkdir -p genomes && touch genomes/genome.fasta.gz && touch genomes/genome2.fasta.gz && touch genomes/genome3.fasta.gz 
-          ./nextflow run main.nf --fasta genomes/ -stub -profile stub --output result_dir_2
+          ./nextflow run main.nf --fasta genomes/ -stub -profile stub --output result_dir_2 --abricate --bakta --busco --eggnog --pgap --prokka --sourmash
