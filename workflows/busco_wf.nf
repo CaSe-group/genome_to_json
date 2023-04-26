@@ -8,8 +8,8 @@ workflow busco_wf {
         if ( params.busco ) { 
             busco_db_download()
             busco(fasta, busco_db_download.out.busco_db_ch)
-            busco_output_ch = Channel.empty()
-            busco_report_ch = Channel.empty()
+            busco_output_ch = busco.out.busco_file_output_ch//.view()
+            busco_report_ch = busco.out.busco_report_output_ch//.view()
         }
         else {
             busco_output_ch = Channel.empty()

@@ -6,7 +6,9 @@ process busco {
         tuple val(name), path(fasta)
         path(busco_db_dir)
     output: 
-        tuple val(name), path("${name}_busco_results"), path("busco_version.txt")
+        tuple val(name), path("${name}_full_table.tsv"), path("busco_version.txt"), path("busco_command.txt"), emit: busco_file_output_ch
+        tuple val(name), path("${name}_full_table.tsv"), env(BUSCO_VERSION), env(COMMAND_TEXT), emit: busco_report_output_ch
+        tuple val(name), path("${name}_busco_results"), emit: busco_files_ch //secondary output-channel to activate publishDir
     script:
         """
         DATASET_BASENAME=\$(echo "${params.busco_db}" | cut -f 1 -d '.')
@@ -19,8 +21,14 @@ process busco {
             --mode genome
 
         generate_plot.py -wd ./${name}_busco_results
+        
+        cp ${name}_busco_results/run_\${DATASET_BASENAME}/full_table.tsv ./${name}_full_table.tsv
 
-        busco --version | cut -f 2 -d ' ' >> busco_version.txt
+        BUSCO_VERSION=\$(busco --version | cut -f 2 -d ' ')
+        echo \${BUSCO_VERSION}> busco_version.txt
+
+        COMMAND_TEXT=\$(echo "busco -in ${fasta} --lineage_dataset \${DATASET_BASENAME} --offline --download_path ${busco_db_dir}/ --out ${name}_busco_results --mode genome")
+        echo \${COMMAND_TEXT} > busco_command.txt
         """  
     stub:
         """
