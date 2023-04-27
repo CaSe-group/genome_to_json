@@ -6,7 +6,7 @@ process busco {
         tuple val(name), path(fasta)
         path(busco_db_dir)
     output: 
-        tuple val(name), path("busco_version.txt"), path("busco_db_version.txt"), path("busco_command.txt"), path("${name}_full_table.tsv"), emit: busco_file_output_ch
+        tuple val(name), path("busco_tool_info.txt"), path("${name}_full_table.tsv"), emit: busco_file_output_ch
         tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), path("${name}_full_table.tsv"), emit: busco_report_output_ch
         tuple val(name), path("${name}_busco_results"), emit: busco_files_ch //secondary output-channel to activate publishDir
     script:
@@ -25,13 +25,13 @@ process busco {
         tail -n +3 ${name}_busco_results/run_\${DATASET_BASENAME}/full_table.tsv | sed "s/# Busco id/Busco_id/" > ./${name}_full_table.tsv
 
         BUSCO_VERSION=\$(busco --version | cut -f 2 -d ' ')
-        echo \${BUSCO_VERSION} > busco_version.txt
+        echo "Busco-Version: \${BUSCO_VERSION}" >> busco_tool_info.txt
 
         BUSCO_DB_VERSION=\$(head -n 2 ${name}_busco_results/run_\${DATASET_BASENAME}/full_table.tsv | tail -n 1 | cut -f 2- -d ':' | sed "s/^ //")
-        echo \${BUSCO_DB_VERSION} > busco_db_version.txt
+        echo "DB-Version(s): \${BUSCO_DB_VERSION}" >> busco_tool_info.txt
 
         COMMAND_TEXT=\$(echo "busco -in ${fasta} --lineage_dataset \${DATASET_BASENAME} --offline --download_path ${busco_db_dir}/ --out ${name}_busco_results --mode genome")
-        echo \${COMMAND_TEXT} > busco_command.txt
+        echo "Used Command: \${COMMAND_TEXT}" >> busco_tool_info.txt
         """  
     stub:
         """
