@@ -36,7 +36,8 @@ process busco {
     stub:
         """
         mkdir ${name}_busco_results
-        echo "stub" >> busco_version.txt
+        touch ${name}_full_table.tsv
+        touch busco_tool_info.txt
         """
 }
 

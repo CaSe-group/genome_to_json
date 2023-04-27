@@ -73,8 +73,6 @@ process abricate_combiner {
         """
         printf "#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%%COVERAGE	%%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE\\n" >> "${name}"_abricate_combined_results.tsv
 
-        touch abricate_version.txt
-        touch abricate_db_version.txt
-        touch abricate_command.txt
+        touch abricate_tool_info.txt
         """
 }
