@@ -14,7 +14,7 @@ process busco_report {
         sed -e 's/#NAMEENV#/${name}/g' | \
         sed -e 's/#TOOLVERSIONENV#/${busco_version}/g' | \
         sed -e 's/#DBVERSIONENV#/${busco_db_version}/g' | \
-        sed -e 's/#COMMANDENV#/${command}/g' | \
+        sed -e 's|#COMMANDENV#|${command}|g' | \
         sed -e 's|#PATHENV#|${params.output}|g' > ${name}_report_busco.Rmd
         """
     stub:
