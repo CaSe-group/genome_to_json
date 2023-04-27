@@ -13,7 +13,7 @@ process json_report {
         if ( !params.deep_json) { deep_json = "false" }
         else { deep_json = "true" }
 
-        if ( params.abricate) { abricate_input = "*abricate_combined_results.tsv,abricate_version.txt,abricate_db_version.txt,abricate_command.txt" }
+        if ( params.abricate) { abricate_input = "*abricate_combined_results.tsv,abricate_tool_info.txt" }
         else { abricate_input = "false" }
 
         if ( params.bakta) { bakta_input = "*_bakta.tsv,*bakta_version.txt" }

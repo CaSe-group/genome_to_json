@@ -84,10 +84,11 @@ def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE):
-	ABRICATE_VERSION = open(f"{ABRICATE_VERSION_FILE}", "r").read().strip()
-	ABRICATE_DB_VERSION = open(f"{ABRICATE_DB_VERSION_FILE}", "r").read().strip().replace('\n','; ')
-	ABRICATE_COMMAND = open(f"{ABRICATE_COMMAND_FILE}", "r").read().strip()
+def abricate_info_parsing(OUTPUT_FILE_NAME, ANALYSING_DATE):
+	ABRICATE_INFO_FILE_ALL_LINES = open(f"{ABRICATE_INFO_FILE}", "r").readlines()
+	ABRICATE_VERSION = ' '.join(ABRICATE_INFO_FILE_ALL_LINES[0].split(':')[1:]).strip()
+	ABRICATE_DB_VERSION = ' '.join(ABRICATE_INFO_FILE_ALL_LINES[1].split(':')[1:]).strip()
+	ABRICATE_COMMAND = ' '.join(ABRICATE_INFO_FILE_ALL_LINES[2].split(':')[1:]).strip()
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("\t\"Abricate_Info\": {\n")
 	RESULT_FILE.write(f"\t\t\"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -259,12 +260,10 @@ else:
 
 if ABRICATE_INPUT != 'false':
 	ABRICATE_RESULT_FILE = glob(ABRICATE_INPUT.split(',')[0])[0]		#split abricate-input by ',' taking the first resulting element -> glob expands the wildcard "*", choosing the first result
-	ABRICATE_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]		#split abricate-input by ',' taking the second resulting element
-	ABRICATE_DB_VERSION_FILE = glob(ABRICATE_INPUT.split(',')[2])[0]	#split abricate-input by ',' taking the third resulting element
-	ABRICATE_COMMAND_FILE = glob(ABRICATE_INPUT.split(',')[3])[0]		#split abricate-input by ',' taking the fourth resulting element
+	ABRICATE_INFO_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]		#split abricate-input by ',' taking the second resulting element
 	DF_ABRICATE = pd.read_csv(ABRICATE_RESULT_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 
-	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_DB_VERSION_FILE, ANALYSING_DATE)
+	abricate_info_parsing(OUTPUT_FILE_NAME, ANALYSING_DATE)
 	
 	if DEEP_JSON == 'false':
 		abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)

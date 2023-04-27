@@ -53,21 +53,21 @@ process abricate_combiner {
     input:
         tuple val(name), path(abricate_version_files), path(db_version_files), path(command_files), path(result_files)
     output:
-        tuple val(name), path("abricate_version.txt"), path("abricate_db_version.txt"), path("abricate_command.txt"), path("*abricate_combined_results.tsv"), emit: abricate_combiner_file_output_ch  //main output-channel with all files
+        tuple val(name), path("abricate_tool_info.txt"), path("*abricate_combined_results.tsv"), emit: abricate_combiner_file_output_ch  //main output-channel with all files
         tuple val(name), env(ABRICATE_VERSION), env(DB_VERSION), env(COMMAND_TEXT), path("*abricate_combined_results.tsv"), emit: abricate_combiner_report_output_ch  //output-channel for Rmarkdown-creation
     script:
         """
         printf "#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%%COVERAGE	%%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE\\n" >> "${name}"_abricate_combined_results.tsv
         tail -q -n +2 *.tsv >> "${name}"_abricate_combined_results.tsv
 
-        ABRICATE_VERSION=\$(cat abricate_version_with_*.txt | uniq)
-        echo \${ABRICATE_VERSION} >> abricate_version.txt
+        ABRICATE_VERSION=\$(cat abricate_version_with_*.txt | uniq | cut -f 2 -d ' ')
+        echo "ABRicate-Version: \${ABRICATE_VERSION}" >> abricate_tool_info.txt
 
         DB_VERSION=\$(cat abricate_*_version.txt | sed -z "s/\\n/; /g" | sed "s/; \\\$//g")
-        echo \${DB_VERSION} >> abricate_db_version.txt
+        echo "DB-Version(s): \${DB_VERSION}" >> abricate_tool_info.txt
 
         COMMAND_TEXT=\$(cat abricate_*_command.txt | sed "s/--db .* >>/--db \\\${abricate_db} >>/g" | sed "s/--db .* --/--db \\\${abricate_db} --/g" | sed "s/_abricate_.*.tsv/_abricate_\\\${abricate_db}.tsv/g" | sed -z "s/--force\\n/--force; /g" | uniq)
-        echo \${COMMAND_TEXT} >> abricate_command.txt 
+        echo "Used Command: \${COMMAND_TEXT}" >> abricate_tool_info.txt 
         """
     stub:
         """
