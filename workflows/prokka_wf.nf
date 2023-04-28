@@ -2,7 +2,7 @@ include { prokka } from './process/prokka.nf'
 
 workflow prokka_wf {
     take: 
-        fasta_input //tuple val(fasta_basename) path(fasta_file)
+        fasta_input // tuple val(name), path(fasta-file)
     main:
         if ( params.prokka ) {
             prokka(fasta_input)
@@ -14,6 +14,6 @@ workflow prokka_wf {
             prokka_report_ch = Channel.empty()
         }
     emit:
-        to_json = prokka_output_ch //tuple val(fasta_basename) path(prokka_file) val(prokka_version)
-        to_report = prokka_report_ch
+        to_json = prokka_output_ch // tuple val(name), path(prokka_result_file), path(prokka_info_file)
+        to_report = prokka_report_ch // tuple val(name), path(prokka_result_file)
 }

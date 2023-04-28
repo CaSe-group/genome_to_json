@@ -6,8 +6,8 @@ process busco {
         tuple val(name), path(fasta)
         path(busco_db_dir)
     output: 
-        tuple val(name), path("busco_tool_info.txt"), path("${name}_full_table.tsv"), emit: busco_file_output_ch
-        tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), path("${name}_full_table.tsv"), emit: busco_report_output_ch
+        tuple val(name), path("busco_tool_info.txt"), path("${name}_busco_results.tsv"), emit: busco_file_output_ch
+        tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), env(PLOT_PERCENTAGE_VALUES), env(PLOT_ABSOLUTE_VALUES), path("${name}_busco_results.tsv"), emit: busco_report_output_ch
         tuple val(name), path("${name}_busco_results"), emit: busco_files_ch //secondary output-channel to activate publishDir
     script:
         """
@@ -22,7 +22,10 @@ process busco {
 
         generate_plot.py -wd ./${name}_busco_results
         
-        tail -n +3 ${name}_busco_results/run_\${DATASET_BASENAME}/full_table.tsv | sed "s/# Busco id/Busco_id/" > ./${name}_full_table.tsv
+        tail -n +3 ${name}_busco_results/run_\${DATASET_BASENAME}/full_table.tsv | sed "s/# Busco id/Busco_id/" > ./${name}_busco_results.tsv
+        
+        PLOT_PERCENTAGE_VALUES=\$(tail -n +40 ${name}_busco_results/busco_figure.R | head -n 1 | cut -f 3- -d ' ')
+        PLOT_ABSOLUTE_VALUES=\$(tail -n +41 ${name}_busco_results/busco_figure.R | head -n 1 | cut -f 3- -d ' ')
 
         BUSCO_VERSION=\$(busco --version | cut -f 2 -d ' ')
         echo "Busco-Version: \${BUSCO_VERSION}" >> busco_tool_info.txt

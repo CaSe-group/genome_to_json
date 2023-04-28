@@ -141,6 +141,7 @@ workflow {
     create_json_entries_wf( 
         abricate_wf.out.to_json,
         bakta_wf.out.to_json,
+        busco_wf.out.to_json,
         prokka_wf.out.to_json,
         sourmash_wf.out.to_json
     )
