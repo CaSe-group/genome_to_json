@@ -19,7 +19,7 @@ process json_report {
         if ( params.bakta) { bakta_input = "*_bakta.tsv,*bakta_version.txt" }
         else { bakta_input = "false" }
 
-        if ( params.busco) { busco_input = "*_busco_results.tsv,busco_tool_info_for_report.txt" }
+        if ( params.busco) { busco_input = "*_busco_results.tsv,busco_tool_info.txt" }
         else { busco_input = "false" }
 
         if ( params.prokka) { prokka_input = "*_prokka.tsv,*prokka_version.txt"}
