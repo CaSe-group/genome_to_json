@@ -43,8 +43,10 @@ process busco {
     stub:
         """
         mkdir ${name}_busco_results
-        touch ${name}_full_table.tsv
+        touch ${name}_busco_results.tsv
         touch busco_tool_info.txt
+        touch busco_tool_info_report.txt
+
         """
 }
 
