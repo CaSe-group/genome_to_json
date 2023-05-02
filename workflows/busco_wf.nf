@@ -16,6 +16,6 @@ workflow busco_wf {
             busco_report_ch = Channel.empty()
         }
     emit:
-        to_json = busco_output_ch // tuple val(name), path(busco_info_file), path(busco_result-file)
+        to_json = busco_output_ch // tuple val(name), path(busco_info_file), path(busco_result_file)
         to_report = busco_report_ch // tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), env(PLOT_PERCENTAGE_VALUES), env(PLOT_ABSOLUTE_VALUES), path(busco_result-file)
 }

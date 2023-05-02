@@ -8,7 +8,8 @@ workflow create_json_entries_wf {
         prokka      // tuple val(name), path(prokka_result_file), path(prokka_info_file)
         sourmash    // tuple val(name), path(sourmash_classification_result_file), path(sourmash_info_file)
     main:
-        merged_ch = abricate.concat(bakta, busco, prokka, sourmash).groupTuple(by: 0).map{ it -> tuple (it[0], tuple (it[1],it[2]).flatten()) }
+        merged_ch = abricate.mix(bakta, busco, prokka, sourmash).groupTuple(by: 0).map{ it -> tuple (it[0], tuple (it[1],it[2]).flatten()) }
+        // to use "groupTuple()" all channels must have the same nr of elements > otherwise results in error: "Cannot invoke method add() on null object"
         //merged_ch.view() //tuple val(fasta-basename), path(analysis_result-files_1)
         json_report(merged_ch)
 }

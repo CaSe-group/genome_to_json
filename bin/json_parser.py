@@ -20,6 +20,7 @@ parser = argparse.ArgumentParser(description = 'Create json-file for upload to M
 #define arguments
 parser.add_argument('-a', '--abricate', help = "Input Abricate-files", default = 'false')
 parser.add_argument('-b', '--bakta', help = "Input Bakta-files", default = 'false')
+parser.add_argument('-c', '--busco', help = "Input Busco-files", default = 'false')
 parser.add_argument('-i', '--hashid', help = "Input hashID", required = True)
 parser.add_argument('-j', '--deep_json', help = "Generate deeper-leveled json-output with ABRicate & Sourmash", default = 'false')
 parser.add_argument('-n', '--new_entry', help = "Activates parsing of hash-ID as sample-ID", default = 'false' )
@@ -33,6 +34,7 @@ arg = parser.parse_args()
 #set arguments as variables:
 ABRICATE_INPUT = arg.abricate
 BAKTA_INPUT = arg.bakta
+BUSCO_INPUT = arg.busco
 DEEP_JSON = arg.deep_json
 HASHID_INPUT = arg.hashid
 NEW_ENTRY = arg.new_entry
@@ -84,11 +86,11 @@ def sample_id_parsing(OUTPUT_FILE_NAME, HASHID_INPUT):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def abricate_info_parsing(OUTPUT_FILE_NAME, ANALYSING_DATE):
-	ABRICATE_INFO_FILE_ALL_LINES = open(f"{ABRICATE_INFO_FILE}", "r").readlines()
-	ABRICATE_VERSION = ' '.join(ABRICATE_INFO_FILE_ALL_LINES[0].split(':')[1:]).strip()
-	ABRICATE_DB_VERSION = ' '.join(ABRICATE_INFO_FILE_ALL_LINES[1].split(':')[1:]).strip()
-	ABRICATE_COMMAND = ' '.join(ABRICATE_INFO_FILE_ALL_LINES[2].split(':')[1:]).strip()
+def abricate_info_parsing(OUTPUT_FILE_NAME, IN_ABRICATE_INFO_FILE, ANALYSING_DATE):
+	ABRICATE_INFO_FILE_ALL_LINES = open(f"{IN_ABRICATE_INFO_FILE}", "r").readlines()
+	ABRICATE_VERSION = ':'.join(ABRICATE_INFO_FILE_ALL_LINES[0].split(':')[1:]).strip()
+	ABRICATE_DB_VERSION = ':'.join(ABRICATE_INFO_FILE_ALL_LINES[1].split(':')[1:]).strip()
+	ABRICATE_COMMAND = ':'.join(ABRICATE_INFO_FILE_ALL_LINES[2].split(':')[1:]).strip()
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("\t\"Abricate_Info\": {\n")
 	RESULT_FILE.write(f"\t\t\"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -130,8 +132,8 @@ def abricate_result_parsing_deep(OUTPUT_FILE_NAME, DF_ABRICATE):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE):
-	BAKTA_VERSION = open(f"{BAKTA_VERSION_FILE}", "r").read().replace("\n","")
+def bakta_info_parsing(OUTPUT_FILE_NAME, IN_BAKTA_INFO_FILE, ANALYSING_DATE):
+	BAKTA_VERSION = open(f"{IN_BAKTA_INFO_FILE}", "r").read().replace("\n","")
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("\t\"Bakta_Info\": {\n")
 	RESULT_FILE.write(f"\t\t\"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -155,8 +157,23 @@ def bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION_FILE, ANALYSING_DATE):
-	PROKKA_VERSION = open(f"{PROKKA_VERSION_FILE}", "r").read().replace("\n","")
+def busco_info_parsing(OUTPUT_FILE_NAME, IN_BUSCO_INFO_FILE, ANALYSING_DATE):
+	BUSCO_INFO_FILE_ALL_LINES = open(f"{IN_BUSCO_INFO_FILE}", "r").readlines()
+	BUSCO_VERSION = ':'.join(BUSCO_INFO_FILE_ALL_LINES[0].split(':')[1:]).strip()
+	BUSCO_DB_VERSION = ':'.join(BUSCO_INFO_FILE_ALL_LINES[1].split(':')[1:]).strip()
+	BUSCO_COMMAND = ':'.join(BUSCO_INFO_FILE_ALL_LINES[2].split(':')[1:]).strip()
+	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
+	RESULT_FILE.write("\t\"Busco_Info\": {\n")
+	RESULT_FILE.write(f"\t\t\"Analysing_Date\": {ANALYSING_DATE},\n")
+	RESULT_FILE.write(f"\t\t\"Busco_Version\": {BUSCO_VERSION},\n")
+	RESULT_FILE.write(f"\t\t\"Busco_Db_Version\": \"{BUSCO_DB_VERSION}\",\n")
+	RESULT_FILE.write(f"\t\t\"Busco_Command\": \"{BUSCO_COMMAND}\"\n")
+	RESULT_FILE.write("\t},\n")
+	RESULT_FILE.close()
+	return RESULT_FILE
+
+def prokka_info_parsing(OUTPUT_FILE_NAME, IN_PROKKA_INFO_FILE, ANALYSING_DATE):
+	PROKKA_VERSION = open(f"{IN_PROKKA_INFO_FILE}", "r").read().replace("\n","")
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("\t\"Prokka_Info\": {\n")
 	RESULT_FILE.write(f"\t\t\"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -178,8 +195,8 @@ def prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA):
 	RESULT_FILE.close()
 	return RESULT_FILE
 
-def sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE):
-	SOURMASH_VERSION = open(f"{SOURMASH_VERSION_FILE}", "r").read().replace("\n","")
+def sourmash_info_parsing(OUTPUT_FILE_NAME, IN_SOURMASH_INFO_FILE, ANALYSING_DATE):
+	SOURMASH_VERSION = open(f"{IN_SOURMASH_INFO_FILE}", "r").read().replace("\n","")
 	RESULT_FILE = open(OUTPUT_FILE_NAME, "a")
 	RESULT_FILE.write("\t\"Sourmash_Info\": {\n")
 	RESULT_FILE.write(f"\t\t\"Analysing_Date\": {ANALYSING_DATE},\n")
@@ -263,7 +280,7 @@ if ABRICATE_INPUT != 'false':
 	ABRICATE_INFO_FILE = glob(ABRICATE_INPUT.split(',')[1])[0]		#split abricate-input by ',' taking the second resulting element
 	DF_ABRICATE = pd.read_csv(ABRICATE_RESULT_FILE, sep = '\t')				#create pandas-dataframe from abricate-file with tab-stop as separator
 
-	abricate_info_parsing(OUTPUT_FILE_NAME, ANALYSING_DATE)
+	abricate_info_parsing(OUTPUT_FILE_NAME, ABRICATE_INFO_FILE, ANALYSING_DATE)
 	
 	if DEEP_JSON == 'false':
 		abricate_result_parsing(OUTPUT_FILE_NAME, DF_ABRICATE)
@@ -272,26 +289,33 @@ if ABRICATE_INPUT != 'false':
 
 if BAKTA_INPUT != 'false':
 	BAKTA_FILE = glob(BAKTA_INPUT.split(',')[0])[0]
-	BAKTA_VERSION_FILE = glob(BAKTA_INPUT.split(',')[1])[0]
+	BAKTA_INFO_FILE = glob(BAKTA_INPUT.split(',')[1])[0]
 	DF_BAKTA = pd.read_csv(BAKTA_FILE, skiprows=2, sep = '\t')
 	
-	bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_VERSION_FILE, ANALYSING_DATE)
+	bakta_info_parsing(OUTPUT_FILE_NAME, BAKTA_INFO_FILE, ANALYSING_DATE)
 	bakta_result_parsing(OUTPUT_FILE_NAME, DF_BAKTA)
+
+if BUSCO_INPUT != 'false':
+	BUSCO_FILE = glob(BUSCO_INPUT.split(',')[0])[0]
+	BUSCO_INFO_FILE = glob(BUSCO_INPUT.split(',')[1])[0]
+
+	busco_info_parsing(OUTPUT_FILE_NAME, BUSCO_INFO_FILE, ANALYSING_DATE)
+
 
 if PROKKA_INPUT != 'false':
 	PROKKA_FILE = glob(PROKKA_INPUT.split(',')[0])[0]
-	PROKKA_VERSION_FILE = glob(PROKKA_INPUT.split(',')[1])[0]
+	PROKKA_INFO_FILE = glob(PROKKA_INPUT.split(',')[1])[0]
 	DF_PROKKA = pd.read_csv(PROKKA_FILE, sep = '\t')
 
-	prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_VERSION_FILE, ANALYSING_DATE)
+	prokka_info_parsing(OUTPUT_FILE_NAME, PROKKA_INFO_FILE, ANALYSING_DATE)
 	prokka_result_parsing(OUTPUT_FILE_NAME, DF_PROKKA)
 
 if SOURMASH_INPUT != 'false':
 	SOURMASH_FILE = glob(SOURMASH_INPUT.split(',')[0])[0]
-	SOURMASH_VERSION_FILE = glob(SOURMASH_INPUT.split(',')[1])[0]
+	SOURMASH_INFO_FILE = glob(SOURMASH_INPUT.split(',')[1])[0]
 	DF_SOURMASH = pd.read_csv(SOURMASH_FILE)
 
-	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_VERSION_FILE, ANALYSING_DATE)
+	sourmash_info_parsing(OUTPUT_FILE_NAME, SOURMASH_INFO_FILE, ANALYSING_DATE)
 	sourmash_result_parsing(OUTPUT_FILE_NAME, DF_SOURMASH)
 
 status_parsing(OUTPUT_FILE_NAME)

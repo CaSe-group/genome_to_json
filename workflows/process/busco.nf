@@ -1,14 +1,15 @@
 process busco {
     label 'busco'
-    publishDir "${params.output}/${name}/${params.buscodir}", mode: 'copy', pattern: "*"
+    publishDir "${params.output}/${name}/${params.buscodir}", mode: 'copy', pattern: "busco_tool_info.txt"
+    publishDir "${params.output}/${name}/${params.buscodir}", mode: 'copy', pattern: "*_busco_results"
     
     input:
         tuple val(name), path(fasta)
         path(busco_db_dir)
     output: 
-        tuple val(name), path("busco_tool_info.txt"), path("${name}_busco_results.tsv"), emit: busco_file_output_ch
+        tuple val(name), path("busco_tool_info_for_report.txt"), path("${name}_busco_results.tsv"),  emit: busco_file_output_ch
         tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), env(PLOT_PERCENTAGE_VALUES), env(PLOT_ABSOLUTE_VALUES), path("${name}_busco_results.tsv"), emit: busco_report_output_ch
-        tuple val(name), path("${name}_busco_results"), emit: busco_files_ch //secondary output-channel to activate publishDir
+        tuple val(name), path("busco_tool_info.txt"), path("${name}_busco_results"), emit: busco_files_ch //secondary output-channel to activate publishDir
     script:
         """
         DATASET_BASENAME=\$(echo "${params.busco_db}" | cut -f 1 -d '.')
@@ -35,6 +36,9 @@ process busco {
 
         COMMAND_TEXT=\$(echo "busco -in ${fasta} --lineage_dataset \${DATASET_BASENAME} --offline --download_path ${busco_db_dir}/ --out ${name}_busco_results --mode genome")
         echo "Used Command: \${COMMAND_TEXT}" >> busco_tool_info.txt
+
+        cat busco_tool_info.txt >> busco_tool_info_for_report.txt
+        echo "\${PLOT_ABSOLUTE_VALUES}" | tr -d 'c() ' >> busco_tool_info_for_report.txt
         """  
     stub:
         """
