@@ -1,5 +1,6 @@
 include { abricate_report } from './process/report_abricate'
 include { bakta_report } from './process/report_bakta'
+include { busco_report} from './process/report_busco'
 include { prokka_report } from './process/report_prokka'
 include { sample_report } from './process/report_sample'
 include { sourmash_report } from './process/report_sourmash'

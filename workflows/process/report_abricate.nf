@@ -14,8 +14,8 @@ process abricate_report {
         sed -e 's/#NAMEENV#/${name}/g' | \
         sed -e 's/#TOOLVERSIONENV#/${abricate_version}/g' | \
         sed -e 's/#DBVERSIONENV#/${abricate_db_version}/g' | \
-        sed -e 's/#COMMANDENV#/${command}/g' | \
-        sed -e 's/#PATHENV#/test/g' > ${name}_report_abricate.Rmd
+        sed -e 's|#COMMANDENV#|${command}|g' | \
+        sed -e 's|#PATHENV#|${params.output}|g' > ${name}_report_abricate.Rmd
         """
     stub:
         """

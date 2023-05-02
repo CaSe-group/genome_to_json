@@ -3,7 +3,7 @@ include { eggnog_emapper } from './process/eggnog.nf'
 
 workflow eggnog_wf {
     take:
-        fasta //tuple val(NAME), path({NAME}.fasta)
+        fasta // tuple val(name), path(fasta-file)
     main:   
         if ( params.eggnog ) { 
             eggnog_db_download()
@@ -16,6 +16,6 @@ workflow eggnog_wf {
             eggnog_report_ch = Channel.empty()
         }
     emit:
-        to_json = eggnog_output_ch 
-        to_report = eggnog_report_ch
+        to_json = eggnog_output_ch // 
+        to_report = eggnog_report_ch // 
 }

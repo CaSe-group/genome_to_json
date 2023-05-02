@@ -16,7 +16,6 @@ process sample_report {
             cat \${FILE} >> ${name}_sample_report.Rmd
             printf "\\n"  >> ${name}_sample_report.Rmd
         done
-
         """
     stub:
         """

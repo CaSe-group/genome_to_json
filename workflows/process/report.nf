@@ -25,7 +25,6 @@ process summary {
             Rscript -e "rmarkdown::render('render_dir/final_report.Rmd')"
 
         cp render_dir/final_report.html final_report.html
-
         """
     stub:
         """

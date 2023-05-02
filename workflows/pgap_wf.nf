@@ -3,7 +3,7 @@ include{ pgap_database } from './process/pgap.nf'
 
 workflow pgap_wf {
     take:
-        fasta //tuple val(NAME), path({NAME}.fasta)
+        fasta // tuple val(name), path(fasta-file)
         species
     main:  
     if ( params.pgap ) { 

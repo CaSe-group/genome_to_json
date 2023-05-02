@@ -3,7 +3,7 @@ include { bakta_database } from './process/bakta.nf'
 
 workflow bakta_wf {
     take:
-        fasta_input //tuple val(fasta-basename) path(fasta-file)
+        fasta_input // tuple val(name), path(fasta-file)
     main:                          
         if ( params.bakta ) { 
             if (params.bakta_db) { database_bakta = file(params.bakta_db) }
@@ -18,8 +18,8 @@ workflow bakta_wf {
             bakta_report_ch = Channel.empty()
         }
     emit:
-        to_json = bakta_json_ch //tuple val(fasta-basename), file(fasta-basename_bakta.tsv), path(bakta_version.txt)
-        to_report = bakta_report_ch //tuple val(fasta-basename), file(fasta-basename_bakta.gff3), path(bakta_version.txt), val("${params.output}/fasta-basename/2.bakta")
+        to_json = bakta_json_ch // tuple val(name), file(bakta_result_file), path(bakta_info_file)
+        to_report = bakta_report_ch // tuple val(name), file(bakta_result_file), path(bakta_info_file), val(bakta_result-dir_path)
 }
 
 /*
