@@ -8,8 +8,8 @@ process abricate {
         tuple val(name), path(dir)
         each abricate_db
     output:
-        tuple val(name), path("abricate_version_with_*.txt"), path("abricate_*_version.txt"), path("abricate_*_command.txt"), path("*abricate_ncbi.tsv"), optional: true, emit: abricate_ncbi_output_ch  //main output-channel if according file was created
-        tuple val(name), path("abricate_version_with_*.txt"), path("abricate_*_version.txt"), path("abricate_*_command.txt"), path("*abricate_*.tsv"), optional: true, emit: abricate_deep_json_output_ch
+        tuple val(name), path("abricate_version_with_*.txt"), path("abricate_*_version.txt"), path("abricate_*_command.txt"), path("*abricate_ncbi.tsv"), optional: true, emit: abricate_ncbi_ch  //main output-channel if according file was created
+        tuple val(name), path("abricate_version_with_*.txt"), path("abricate_*_version.txt"), path("abricate_*_command.txt"), path("*abricate_*.tsv"), optional: true, emit: abricate_deep_json_ch
         tuple val(name), val(abricate_db), path("*.tsv"), emit: abricate_files_ch //secondary output-channel to activate publishDir & feed res-parser
     script:
         if (! params.abricate_update)
@@ -34,13 +34,10 @@ process abricate {
         """
     stub:
         """
-        printf "#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%%COVERAGE	%%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE\\n" >> "${name}"_abricate_"${abricate_db}".tsv
-        printf "S.126.21.Cf.fasta	S.126.21.Cf_contig35	15020	15820	-	blaVIM-1	1-801/801	===============	0/0	100.00	100.00	ncbi	NG_050336.1	subclass B1 metallo-beta-lactamase VIM-1	CARBAPENEM\\n" >> "${name}"_abricate_"${abricate_db}".tsv
-        printf "S.126.21.Cf.fasta	S.126.21.Cf_contig35	14358	14912	-	aac(6')-Ib-G	1-555/555	===============	0/0	100.00	99.82	ncbi	NG_052361.1	AAC(6')-Ib family aminoglycoside 6'-N-acetyltransferase	GENTAMICIN\\n" >> "${name}"_abricate_"${abricate_db}".tsv
-        
-        touch abricate_version_with_${abricate_db}.txt
-        touch abricate_${abricate_db}_command.txt
-        touch abricate_${abricate_db}_version.txt
+        touch "${name}"_abricate_"${abricate_db}".tsv \
+            abricate_version_with_${abricate_db}.txt \
+            abricate_${abricate_db}_command.txt \
+            abricate_${abricate_db}_version.txt
         """
 }
 
@@ -53,8 +50,8 @@ process abricate_combiner {
     input:
         tuple val(name), path(abricate_version_files), path(db_version_files), path(command_files), path(result_files)
     output:
-        tuple val(name), path("abricate_tool_info.txt"), path("*abricate_combined_results.tsv"), emit: abricate_combiner_file_output_ch  //main output-channel with all files
-        tuple val(name), env(ABRICATE_VERSION), env(DB_VERSION), env(COMMAND_TEXT), path("*abricate_combined_results.tsv"), emit: abricate_combiner_report_output_ch  //output-channel for Rmarkdown-creation
+        tuple val(name), path("abricate_tool_info.txt"), path("*abricate_combined_results.tsv"), emit: abricate_combiner_file_ch  //main output-channel with all files
+        tuple val(name), env(ABRICATE_VERSION), env(DB_VERSION), env(COMMAND_TEXT), path("*abricate_combined_results.tsv"), emit: abricate_combiner_report_ch  //output-channel for Rmarkdown-creation
     script:
         """
         printf "#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%%COVERAGE	%%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE\\n" >> "${name}"_abricate_combined_results.tsv
@@ -71,8 +68,7 @@ process abricate_combiner {
         """
     stub:
         """
-        printf "#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%%COVERAGE	%%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE\\n" >> "${name}"_abricate_combined_results.tsv
-
-        touch abricate_tool_info.txt
+        touch "${name}"_abricate_combined_results.tsv \
+            abricate_tool_info.txt
         """
 }

@@ -25,7 +25,7 @@ process pgap {
         path(pgap_db)
 
     output: 
-        tuple val(name),path("annot*"),path("VERSION") 
+        tuple val(name), path("annot*"), path("VERSION") 
     script:
         """
         bash yaml_creator.sh ${fasta} "${species}"

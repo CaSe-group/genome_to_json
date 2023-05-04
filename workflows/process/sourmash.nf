@@ -24,7 +24,8 @@ process sourmash_classification {
         tuple val(name), path(signatures)
         path(sourmash_db)
     output: 
-        tuple val(name), path("${name}_sourmash_taxonomy.csv"), path("sourmash_version.txt")
+        tuple val(name), path("${name}_sourmash_taxonomy.csv"), path("sourmash_tool_info.txt"), emit: sourmash_file_ch
+        tuple val(name), env(SOURMASH_VERSION), env(SOURMASH_DB_VERSION), env(COMMAND_TEXT), path("${name}_sourmash_taxonomy.csv"), emit: sourmash_report_ch
     script:
         """
         sourmash lca classify \
@@ -32,7 +33,14 @@ process sourmash_classification {
             --query ${signatures} \
             > ${name}_sourmash_taxonomy.csv
 
-        sourmash --version | cut -f 2 -d ' ' >> sourmash_version.txt
+        SOURMASH_VERSION=\$(sourmash --version | cut -f 2 -d ' ')
+        echo "Sourmash-Version: \${SOURMASH_VERSION}" >> sourmash_tool_info.txt
+
+        SOURMASH_DB_VERSION=\$(echo "${sourmash_db}")
+        echo "DB-Version(s): \${SOURMASH_DB_VERSION}" >> sourmash_tool_info.txt
+
+        COMMAND_TEXT=\$(echo "sourmash lca classify --db ${sourmash_db} --query ${signatures} > ${name}_sourmash_taxonomy.csv")
+        echo "Used Command: \${COMMAND_TEXT}" >> sourmash_tool_info.txt
         """  
     stub:
         """

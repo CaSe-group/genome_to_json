@@ -10,16 +10,16 @@ workflow bakta_wf {
             else { database_bakta = bakta_database() }
                 
             bakta(fasta_input,database_bakta)
+            bakta_output_ch = bakta.out.bakta_file_ch
             bakta_report_ch = bakta.out.bakta_report_ch
-            bakta_json_ch = bakta.out.bakta_json_ch
         }
         else {
-            bakta_json_ch = Channel.empty()
+            bakta_output_ch = Channel.empty()
             bakta_report_ch = Channel.empty()
         }
     emit:
-        to_json = bakta_json_ch // tuple val(name), file(bakta_result_file), path(bakta_info_file)
-        to_report = bakta_report_ch // tuple val(name), file(bakta_result_file), path(bakta_info_file), val(bakta_result-dir_path)
+        to_json = bakta_output_ch // tuple val(name), file(bakta_result_file), path(bakta_info_file)
+        to_report = bakta_report_ch // tuple val(name), val(version), val(db_version), val(command), file(bakta_result_file)
 }
 
 /*

@@ -6,7 +6,7 @@ workflow prokka_wf {
     main:
         if ( params.prokka ) {
             prokka(fasta_input)
-            prokka_output_ch = prokka.out.prokka_tsv_ch
+            prokka_output_ch = prokka.out.prokka_file_ch
             prokka_report_ch = prokka.out.prokka_report_ch
         }
         else { 
@@ -15,5 +15,5 @@ workflow prokka_wf {
         }
     emit:
         to_json = prokka_output_ch // tuple val(name), path(prokka_result_file), path(prokka_info_file)
-        to_report = prokka_report_ch // tuple val(name), path(prokka_result_file)
+        to_report = prokka_report_ch // tuple val(name), val(version), val(db_version), val(command), path(prokka_result_file)
 }

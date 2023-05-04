@@ -8,8 +8,8 @@ workflow busco_wf {
         if ( params.busco ) {
             busco_db_download()
             busco(fasta, busco_db_download.out.busco_db_ch)
-            busco_output_ch = busco.out.busco_file_output_ch
-            busco_report_ch = busco.out.busco_report_output_ch
+            busco_output_ch = busco.out.busco_file_ch
+            busco_report_ch = busco.out.busco_report_ch
         }
         else {
             busco_output_ch = Channel.empty()
@@ -17,5 +17,5 @@ workflow busco_wf {
         }
     emit:
         to_json = busco_output_ch // tuple val(name), path(busco_info_file), path(busco_result_file)
-        to_report = busco_report_ch // tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), env(PLOT_PERCENTAGE_VALUES), env(PLOT_ABSOLUTE_VALUES), path(busco_result-file)
+        to_report = busco_report_ch // tuple val(name), val(version), val(db_version), val(command), env(PLOT_PERCENTAGE_VALUES), env(PLOT_ABSOLUTE_VALUES), path(busco_result-file)
 }

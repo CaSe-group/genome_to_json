@@ -7,8 +7,8 @@ process busco {
         tuple val(name), path(fasta)
         path(busco_db_dir)
     output: 
-        tuple val(name), path("busco_tool_info.txt"), path("${name}_busco_results.tsv"),  emit: busco_file_output_ch
-        tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), env(PLOT_PERCENTAGE_VALUES), env(PLOT_ABSOLUTE_VALUES), path("${name}_busco_results.tsv"), emit: busco_report_output_ch
+        tuple val(name), path("busco_tool_info.txt"), path("${name}_busco_results.tsv"),  emit: busco_file_ch
+        tuple val(name), env(BUSCO_VERSION), env(BUSCO_DB_VERSION), env(COMMAND_TEXT), env(PLOT_PERCENTAGE_VALUES), env(PLOT_ABSOLUTE_VALUES), path("${name}_busco_results.tsv"), emit: busco_report_ch
         tuple val(name), path("${name}_busco_results"), emit: busco_files_ch //secondary output-channel to activate publishDir
     script:
         """
@@ -40,8 +40,8 @@ process busco {
     stub:
         """
         mkdir ${name}_busco_results
-        touch ${name}_busco_results.tsv
-        touch busco_tool_info.txt
+        touch ${name}_busco_results.tsv \
+            busco_tool_info.txt
         """
 }
 
@@ -67,7 +67,7 @@ process busco_db_download {
         busco_db_basename = params.busco_db.split("\\.")[0]
         """
         mkdir -p busco_downloads/lineages busco_downloads/placement_files
-        touch busco_downloads/file_versions.tsv
-        touch busco_downloads/lineages/bacteria_odb10
+        touch busco_downloads/file_versions.tsv \
+            busco_downloads/lineages/bacteria_odb10
         """
 }

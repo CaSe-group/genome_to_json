@@ -16,16 +16,16 @@ process json_report {
         if ( params.abricate) { abricate_input = "*abricate_combined_results.tsv,abricate_tool_info.txt" }
         else { abricate_input = "false" }
 
-        if ( params.bakta) { bakta_input = "*_bakta.tsv,*bakta_version.txt" }
+        if ( params.bakta) { bakta_input = "*_bakta.tsv,bakta_tool_info.txt" }
         else { bakta_input = "false" }
 
         if ( params.busco) { busco_input = "*_busco_results.tsv,busco_tool_info.txt" }
         else { busco_input = "false" }
 
-        if ( params.prokka) { prokka_input = "*_prokka.tsv,*prokka_version.txt"}
+        if ( params.prokka) { prokka_input = "*_prokka.tsv,prokka_tool_info.txt"}
         else { prokka_input = "false" }
 
-        if ( params.sourmash) { sourmash_input = "*_sourmash_taxonomy.csv,*sourmash_version.txt" }
+        if ( params.sourmash) { sourmash_input = "*_sourmash_taxonomy.csv,sourmash_tool_info.txt" }
         else { sourmash_input = "false" }
      
         """
