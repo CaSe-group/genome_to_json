@@ -45,7 +45,7 @@ process sourmash_classification {
     stub:
         """
         touch ${name}_sourmash_taxonomy.csv \
-            sourmash_version.txt
+            sourmash_tool_info.txt
         """
 }
 
