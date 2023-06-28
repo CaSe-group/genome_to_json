@@ -186,12 +186,11 @@ ${c_yellow}General options:${c_reset}
 ${c_yellow}Tool switches:${c_reset}
     --abricate  turns on abricate-process
     --bakta     turns on bakta-process
-    --pgap      turns on pgap-process
     --busco     turns on busco-process
     --eggnog    turns on eggnog-process
+    --pgap      turns on pgap-process [requires "--species"-flag]
     --prokka    turns on prokka-process
     --sourmash  turns on sourmash-process
-    --pgap      turns on pgap-process
 
 ${c_yellow}Tool options:${c_reset}
     --abricate_coverage sets the coverage value [%] that ABRicate shall use
