@@ -138,24 +138,28 @@ workflow {
     sourmash_wf(fasta_ch) // Taxonomic-classification
 
     // 3. json-output
-    create_json_entries_wf( 
-        abricate_wf.out.to_json,
-        bakta_wf.out.to_json,
-        busco_wf.out.to_json,
-        prokka_wf.out.to_json,
-        sourmash_wf.out.to_json
-    )
+    if ( !params.no_json ) {
+        create_json_entries_wf( 
+            abricate_wf.out.to_json,
+            bakta_wf.out.to_json,
+            busco_wf.out.to_json,
+            prokka_wf.out.to_json,
+            sourmash_wf.out.to_json
+        )
+    }
 
     // 4. report
-    report_generation_full_wf( 
-        abricate_wf.out.to_report,
-        bakta_wf.out.to_report,
-        busco_wf.out.to_report,
-        eggnog_wf.out.to_report,
-        pgap_wf.out.to_report,
-        prokka_wf.out.to_report,
-        sourmash_wf.out.to_report
-    )
+    if ( !params.no_html) {
+        report_generation_full_wf( 
+            abricate_wf.out.to_report,
+            bakta_wf.out.to_report,
+            busco_wf.out.to_report,
+            eggnog_wf.out.to_report,
+            pgap_wf.out.to_report,
+            prokka_wf.out.to_report,
+            sourmash_wf.out.to_report
+        )
+    }
 }
 
 
@@ -181,6 +185,8 @@ ${c_yellow}Input:${c_reset}
 ${c_yellow}General options:${c_reset}
     --new_entry     activates parsing of sample-name as sample-ID instead of
                     hash-ID (therefore json can be uploaded as new entry)
+    --no_html       deactivates output of final HTML-Report
+    --no_json       deactivates output of json-files
     --split_fasta   splits multi-line fastas into single fasta-files
 
 ${c_yellow}Tool switches:${c_reset}
