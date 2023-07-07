@@ -12,6 +12,7 @@ process summary {
             mkdir -p render_dir
             cp ${markdown} render_dir/final_report.Rmd
             cp *.input render_dir/
+            cp ${workflow.projectDir}/submodule/rmarkdown_reports/supplement_files/PathogenSeqCoreFacility_noBackground.png render_dir/
             cp *.svg render_dir/ 2>/dev/null || :
 
         # append sample Rmds to final report
