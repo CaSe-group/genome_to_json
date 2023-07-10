@@ -15,3 +15,4 @@ also for mutlifasta-input & different packing-formats [.gz; .xz].
 ## ToDos
 * [ ] taxonomic determination [GTDB]
 * [ ] plasmid [yes/no]
+* [ ] add link to PathogenSeq-website to Logo in final html-report
