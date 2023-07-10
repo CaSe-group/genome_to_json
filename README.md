@@ -1,8 +1,7 @@
-# Bacventure
+# Genome-to-json
 ## Bacterial Genome Analyser
 * CaSe-group workflow to analyze microbial genomes creating a detailed report & json
 * wrapped in a nextflow workflow to quickly gather the important features and collect the different tool-outputs accordingly
-
 
 ## Features
 * taxonomic determination [sourmash]
